@@ -1,0 +1,6 @@
+[
+  { "id": 1001, "name": "Alice Johnson", "email": "alice.j@example.edu", "program": "Computer Science" },
+  { "id": 1002, "name": "Ben Patel", "email": "ben.p@example.edu", "program": "Business" },
+  { "id": 1003, "name": "Carla Gomez", "email": "carla.g@example.edu", "program": "Biology" },
+  { "id": 1004, "name": "Daniel Kim", "email": "dan.k@example.edu", "program": "Mechanical Eng." }
+]

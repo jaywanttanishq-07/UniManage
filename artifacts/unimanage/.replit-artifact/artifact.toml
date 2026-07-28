@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/"
+title = "UniManage"
+version = "1.0.0"
+id = "artifacts/unimanage"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 25668
+
+[services.development]
+run = "pnpm --filter @workspace/unimanage run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/unimanage", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/unimanage/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "25668"
+BASE_PATH = "/"

@@ -1,0 +1,24 @@
+import React from 'react'
+import { NavLink } from 'react-router-dom'
+
+export default function NavBar(){
+  return (
+    <header className="site-header">
+      <div className="nav-inner">
+        <div className="brand">
+          <div className="logo-mark" aria-hidden="true">UM</div>
+          <div>
+            <div className="brand-title">UniManage</div>
+            <div className="brand-sub">University Management</div>
+          </div>
+        </div>
+
+        <nav className="nav-links" role="navigation" aria-label="Main">
+          <NavLink to="/" end className={({isActive})=>isActive ? 'nav-link active' : 'nav-link'}>Dashboard</NavLink>
+          <NavLink to="/students" className={({isActive})=>isActive ? 'nav-link active' : 'nav-link'}>Students</NavLink>
+          <NavLink to="/courses" className={({isActive})=>isActive ? 'nav-link active' : 'nav-link'}>Courses</NavLink>
+        </nav>
+      </div>
+    </header>
+  )
+}

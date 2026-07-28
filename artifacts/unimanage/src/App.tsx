@@ -1,0 +1,21 @@
+import { Routes, Route } from 'react-router-dom';
+import NavBar from './components/NavBar';
+import Dashboard from './pages/Dashboard';
+import Students from './pages/Students';
+import Courses from './pages/Courses';
+
+export default function App() {
+  return (
+    <div className="app-root">
+      <NavBar />
+      <main className="container">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/courses" element={<Courses />} />
+        </Routes>
+      </main>
+      <footer className="site-footer">© {new Date().getFullYear()} UniManage</footer>
+    </div>
+  );
+}
