@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Building2,
   CalendarDays, ClipboardList, BarChart3, CreditCard, Library,
-  BedDouble, Bus, Bell, FileText, Settings
+  BedDouble, Bus, Bell, FileText, Settings, CalendarCheck
 } from 'lucide-react';
 
 const sections = [
@@ -20,6 +20,7 @@ const sections = [
       { to: '/courses',     label: 'Courses',     Icon: BookOpen },
       { to: '/departments', label: 'Departments', Icon: Building2 },
       { to: '/timetable',   label: 'Timetable',   Icon: CalendarDays },
+      { to: '/attendance',  label: 'Attendance',  Icon: CalendarCheck },
     ],
   },
   {

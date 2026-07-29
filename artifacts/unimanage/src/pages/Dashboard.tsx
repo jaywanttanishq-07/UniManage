@@ -1,10 +1,11 @@
 import { useNavigate } from 'react-router-dom';
+import { useCountUp } from '../hooks/useCountUp';
 
-const stats = [
-  { label: 'Total Students', value: '1,245', icon: '🎓' },
-  { label: 'Teachers',       value: '86',    icon: '👨‍🏫' },
-  { label: 'Active Courses', value: '54',    icon: '📚' },
-  { label: 'Departments',    value: '12',    icon: '🏛️' },
+const STATS = [
+  { label: 'Total Students', target: 1245, icon: '🎓', to: '/students' },
+  { label: 'Teachers',       target: 86,   icon: '👨‍🏫', to: '/teachers' },
+  { label: 'Active Courses', target: 54,   icon: '📚', to: '/courses' },
+  { label: 'Departments',    target: 12,   icon: '🏛️', to: '/departments' },
 ];
 
 const activity = [
@@ -23,13 +24,14 @@ const upcoming = [
   { date: 'Aug 10', event: 'Library catalogue update',   badge: 'badge-gray' },
 ];
 
-function StatCard({ label, value, icon, to }: { label: string; value: string; icon: string; to: string }) {
+function StatCard({ label, target, icon, to, delay }: { label: string; target: number; icon: string; to: string; delay: number }) {
   const nav = useNavigate();
+  const val = useCountUp(target, 1000, delay);
   return (
-    <div className="stat-card" onClick={() => nav(to)} style={{ cursor: 'pointer' }}>
+    <div className="stat-card" onClick={() => nav(to)} style={{ cursor: 'pointer', animationDelay: `${delay}ms` }}>
       <div className="stat-icon">{icon}</div>
       <div>
-        <div className="stat-value">{value}</div>
+        <div className="stat-value">{val.toLocaleString()}</div>
         <div className="stat-label">{label}</div>
       </div>
     </div>
@@ -47,10 +49,9 @@ export default function Dashboard() {
       </header>
 
       <div className="grid-4">
-        <StatCard label="Total Students" value="1,245" icon="🎓" to="/students" />
-        <StatCard label="Teachers"       value="86"    icon="👨‍🏫" to="/teachers" />
-        <StatCard label="Active Courses" value="54"    icon="📚" to="/courses" />
-        <StatCard label="Departments"    value="12"    icon="🏛️" to="/departments" />
+        {STATS.map((s, i) => (
+          <StatCard key={s.label} label={s.label} target={s.target} icon={s.icon} to={s.to} delay={i * 80} />
+        ))}
       </div>
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>

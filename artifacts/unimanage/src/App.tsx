@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import NavBar from './components/NavBar';
 import Dashboard    from './pages/Dashboard';
 import Students     from './pages/Students';
@@ -14,14 +14,16 @@ import Hostel       from './pages/Hostel';
 import Transport    from './pages/Transport';
 import Notices      from './pages/Notices';
 import Reports      from './pages/Reports';
-import SettingsPage from './pages/SettingsPage';
+import SettingsPage  from './pages/SettingsPage';
+import Attendance   from './pages/Attendance';
 
 export default function App() {
+  const location = useLocation();
   return (
     <div className="app-root">
       <NavBar />
       <div className="main-content">
-        <Routes>
+        <Routes location={location} key={location.pathname}>
           <Route path="/"           element={<Dashboard />} />
           <Route path="/students"   element={<Students />} />
           <Route path="/teachers"   element={<Teachers />} />
@@ -36,7 +38,8 @@ export default function App() {
           <Route path="/transport"  element={<Transport />} />
           <Route path="/notices"    element={<Notices />} />
           <Route path="/reports"    element={<Reports />} />
-          <Route path="/settings"   element={<SettingsPage />} />
+          <Route path="/settings"    element={<SettingsPage />} />
+          <Route path="/attendance" element={<Attendance />} />
         </Routes>
       </div>
     </div>

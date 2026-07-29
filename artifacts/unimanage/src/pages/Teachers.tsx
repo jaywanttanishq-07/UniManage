@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { TEACHER_ATT, attPct, attBadge } from '../data/attendance';
 
 interface Teacher { id: number; name: string; subject: string; dept: string; email: string; phone: string; status: string; }
 
@@ -52,11 +53,13 @@ export default function Teachers() {
 
       <div className="table-card">
         <table className="uni-table">
-          <thead><tr><th>ID</th><th>Name</th><th>Subject</th><th>Department</th><th>Email</th><th>Phone</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead><tr><th>ID</th><th>Name</th><th>Subject</th><th>Department</th><th>Email</th><th>Phone</th><th>Status</th><th>Attendance</th><th>Actions</th></tr></thead>
           <tbody>
             {filtered.length === 0
-              ? <tr className="empty-row"><td colSpan={8}>No teachers found</td></tr>
-              : filtered.map(t => (
+              ? <tr className="empty-row"><td colSpan={9}>No teachers found</td></tr>
+              : filtered.map(t => {
+                const pct = attPct(TEACHER_ATT[t.id] ?? {});
+                return (
                 <tr key={t.id}>
                   <td>{t.id}</td>
                   <td style={{ fontWeight: 600 }}>{t.name}</td>
@@ -65,12 +68,21 @@ export default function Teachers() {
                   <td className="muted">{t.email}</td>
                   <td className="muted">{t.phone}</td>
                   <td><span className={`badge ${t.status === 'Active' ? 'badge-green' : 'badge-yellow'}`}>{t.status}</span></td>
+                  <td>
+                    <div className="att-inline">
+                      <div className="att-inline-bar-wrap">
+                        <div className="att-inline-bar" style={{ width: `${pct}%`, background: pct >= 90 ? '#60a5fa' : pct >= 75 ? '#f59e0b' : '#ef4444' }} />
+                      </div>
+                      <span className={`badge ${attBadge(pct)}`}>{pct}%</span>
+                    </div>
+                  </td>
                   <td style={{ display: 'flex', gap: 6 }}>
                     <button className="btn-muted btn-sm" onClick={() => openEdit(t)}>Edit</button>
                     <button className="btn-danger" onClick={() => del(t.id)}>Delete</button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
           </tbody>
         </table>
       </div>

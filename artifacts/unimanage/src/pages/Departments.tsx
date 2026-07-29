@@ -2,6 +2,11 @@ import { useState } from 'react';
 
 interface Dept { id: number; name: string; head: string; faculty: number; courses: number; students: number; established: string; }
 
+const DEPT_ICONS: Record<string, string> = {
+  'Computer Science': '💻', 'Mechanical Eng.': '⚙️', 'Biology': '🧬',
+  'Business': '📊', 'Mathematics': '📐', 'Chemistry': '🧪',
+};
+
 const INITIAL: Dept[] = [
   { id: 1, name: 'Computer Science', head: 'Dr. Sarah Mitchell', faculty: 18, courses: 24, students: 312, established: '1998' },
   { id: 2, name: 'Mechanical Eng.',  head: 'Prof. James Carter',  faculty: 15, courses: 20, students: 240, established: '1985' },
@@ -29,7 +34,7 @@ export default function Departments() {
     e.preventDefault();
     if (!form.name.trim()) return alert('Name required');
     if (editing) setList(p => p.map(d => d.id === form.id ? form : d));
-    else setList(p => [form, ...p]);
+    else setList(p => [...p, form]);
     setShow(false);
   }
 
@@ -44,32 +49,46 @@ export default function Departments() {
         <button className="btn-gold" onClick={openAdd}>+ Add Department</button>
       </header>
 
-      <div className="grid-3" style={{ marginBottom: 18 }}>
+      <div className="grid-3" style={{ marginBottom: 24 }}>
         <div className="stat-card"><div className="stat-icon">🏛️</div><div><div className="stat-value">{list.length}</div><div className="stat-label">Departments</div></div></div>
         <div className="stat-card"><div className="stat-icon">👨‍🏫</div><div><div className="stat-value">{totalFaculty}</div><div className="stat-label">Total Faculty</div></div></div>
         <div className="stat-card"><div className="stat-icon">📚</div><div><div className="stat-value">{totalCourses}</div><div className="stat-label">Total Courses</div></div></div>
       </div>
 
-      <div className="table-card">
-        <table className="uni-table">
-          <thead><tr><th>Department</th><th>Head of Dept.</th><th>Faculty</th><th>Courses</th><th>Students</th><th>Est.</th><th>Actions</th></tr></thead>
-          <tbody>
-            {list.map(d => (
-              <tr key={d.id}>
-                <td style={{ fontWeight: 700 }}>{d.name}</td>
-                <td>{d.head}</td>
-                <td>{d.faculty}</td>
-                <td>{d.courses}</td>
-                <td>{d.students.toLocaleString()}</td>
-                <td className="muted">{d.established}</td>
-                <td style={{ display: 'flex', gap: 6 }}>
+      <div className="dept-grid">
+        {list.map((d, i) => {
+          const icon = DEPT_ICONS[d.name] ?? '🏛️';
+          return (
+            <div key={d.id} className="dept-card" style={{ animation: 'popIn .38s cubic-bezier(.22,.68,0,1.2) both', animationDelay: `${i * 70}ms` }}>
+              <div className="dept-card-header">
+                <span className="dept-icon">{icon}</span>
+                <div className="dept-card-actions">
                   <button className="btn-muted btn-sm" onClick={() => openEdit(d)}>Edit</button>
                   <button className="btn-danger" onClick={() => del(d.id)}>Delete</button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+              <h3 className="dept-card-name">{d.name}</h3>
+              <p className="dept-card-head">🎓 {d.head}</p>
+              <div className="dept-card-stats">
+                <div className="dept-stat">
+                  <span className="dept-stat-value">{d.faculty}</span>
+                  <span className="dept-stat-label">Faculty</span>
+                </div>
+                <div className="dept-stat-divider" />
+                <div className="dept-stat">
+                  <span className="dept-stat-value">{d.courses}</span>
+                  <span className="dept-stat-label">Courses</span>
+                </div>
+                <div className="dept-stat-divider" />
+                <div className="dept-stat">
+                  <span className="dept-stat-value">{d.students.toLocaleString()}</span>
+                  <span className="dept-stat-label">Students</span>
+                </div>
+              </div>
+              <div className="dept-card-footer">Est. {d.established}</div>
+            </div>
+          );
+        })}
       </div>
 
       {show && (

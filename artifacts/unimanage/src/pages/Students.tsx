@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import StudentFormModal from '../components/StudentFormModal';
+import { STUDENT_ATT, attPct, attBadge } from '../data/attendance';
 
 export interface Student {
   id: number; name: string; email: string; program: string; year: string; status: string;
@@ -47,11 +48,13 @@ export default function Students() {
 
       <div className="table-card">
         <table className="uni-table">
-          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Program</th><th>Year</th><th>Status</th><th>Actions</th></tr></thead>
+          <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Program</th><th>Year</th><th>Status</th><th>Attendance</th><th>Actions</th></tr></thead>
           <tbody>
             {filtered.length === 0
-              ? <tr className="empty-row"><td colSpan={7}>No students found</td></tr>
-              : filtered.map(s => (
+              ? <tr className="empty-row"><td colSpan={8}>No students found</td></tr>
+              : filtered.map(s => {
+                const pct = attPct(STUDENT_ATT[s.id] ?? {});
+                return (
                 <tr key={s.id}>
                   <td>{s.id}</td>
                   <td style={{ fontWeight: 600 }}>{s.name}</td>
@@ -59,12 +62,21 @@ export default function Students() {
                   <td>{s.program}</td>
                   <td>{s.year}</td>
                   <td><span className={`badge ${s.status === 'Active' ? 'badge-green' : s.status === 'On Leave' ? 'badge-yellow' : 'badge-gray'}`}>{s.status}</span></td>
+                  <td>
+                    <div className="att-inline">
+                      <div className="att-inline-bar-wrap">
+                        <div className="att-inline-bar" style={{ width: `${pct}%`, background: pct >= 90 ? 'var(--gold)' : pct >= 75 ? '#f59e0b' : '#ef4444' }} />
+                      </div>
+                      <span className={`badge ${attBadge(pct)}`}>{pct}%</span>
+                    </div>
+                  </td>
                   <td style={{ display: 'flex', gap: 6 }}>
                     <button className="btn-muted btn-sm" onClick={() => { setEditing(s); setShow(true); }}>Edit</button>
                     <button className="btn-danger" onClick={() => del(s.id)}>Delete</button>
                   </td>
                 </tr>
-              ))}
+                );
+              })}
           </tbody>
         </table>
       </div>
