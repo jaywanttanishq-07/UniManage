@@ -31,7 +31,7 @@ function StatCard({ label, target, icon, to, delay }: { label: string; target: n
     <div className="stat-card" onClick={() => nav(to)} style={{ cursor: 'pointer', animationDelay: `${delay}ms` }}>
       <div className="stat-icon">{icon}</div>
       <div>
-        <div className="stat-value">{val.toLocaleString()}</div>
+        <div className="stat-value font-extrabold">{val.toLocaleString()}</div>
         <div className="stat-label">{label}</div>
       </div>
     </div>

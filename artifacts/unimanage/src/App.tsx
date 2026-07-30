@@ -1,5 +1,6 @@
 import { Routes, Route, useLocation } from 'react-router-dom';
-import NavBar from './components/NavBar';
+import NavBar          from './components/NavBar';
+import MeshBackground  from './components/MeshBackground';
 import Dashboard    from './pages/Dashboard';
 import Students     from './pages/Students';
 import Teachers     from './pages/Teachers';
@@ -16,11 +17,13 @@ import Notices      from './pages/Notices';
 import Reports      from './pages/Reports';
 import SettingsPage  from './pages/SettingsPage';
 import Attendance   from './pages/Attendance';
+import Scholarship  from './pages/Scholarship';
 
 export default function App() {
   const location = useLocation();
   return (
     <div className="app-root">
+      <MeshBackground />
       <NavBar />
       <div className="main-content">
         <Routes location={location} key={location.pathname}>
@@ -39,7 +42,8 @@ export default function App() {
           <Route path="/notices"    element={<Notices />} />
           <Route path="/reports"    element={<Reports />} />
           <Route path="/settings"    element={<SettingsPage />} />
-          <Route path="/attendance" element={<Attendance />} />
+          <Route path="/attendance"  element={<Attendance />} />
+          <Route path="/scholarship" element={<Scholarship />} />
         </Routes>
       </div>
     </div>

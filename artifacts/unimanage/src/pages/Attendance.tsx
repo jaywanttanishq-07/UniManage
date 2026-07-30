@@ -298,16 +298,36 @@ export default function Attendance() {
           <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 14, color: '#e6e6e6' }}>Student Attendance Summary</h3>
           <div className="att-person-grid" style={{ marginBottom: 28 }}>
             {Object.entries(STUDENT_INFO).map(([idStr, info]) => {
-              const id  = +idStr;
-              const pct = attPct(studentAtt[id] ?? {});
+              const id      = +idStr;
+              const records = studentAtt[id] ?? {};
+              const pct     = attPct(records);
+              const absentDays = SCHOOL_DAYS.filter(d => records[d.date] === 'Absent');
+              const lateDays   = SCHOOL_DAYS.filter(d => records[d.date] === 'Late');
               return (
-                <div key={id} className="att-person-card">
+                <div key={id} className="att-person-card att-person-card--expand">
                   <div className="att-person-avatar">{info.name.charAt(0)}</div>
                   <div className="att-person-info">
                     <div className="att-person-name">{info.name}</div>
                     <div className="att-person-sub">{info.program} · ID {id}</div>
                     <div className="att-person-bar-wrap">
                       <div className="att-person-bar" style={{ width: `${pct}%`, background: pct >= 90 ? 'var(--gold)' : pct >= 75 ? '#f59e0b' : '#ef4444' }} />
+                    </div>
+                    <div className="att-absent-dates">
+                      {absentDays.length === 0 && lateDays.length === 0
+                        ? <span className="att-no-absence">✓ No absences</span>
+                        : <>
+                            {absentDays.map(d => (
+                              <span key={d.date} className="att-date-chip att-date-chip--absent" title={d.day}>
+                                {new Date(d.date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+                              </span>
+                            ))}
+                            {lateDays.map(d => (
+                              <span key={d.date} className="att-date-chip att-date-chip--late" title={`Late — ${d.day}`}>
+                                {new Date(d.date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})} ⏰
+                              </span>
+                            ))}
+                          </>
+                      }
                     </div>
                   </div>
                   <span className={`badge ${attBadge(pct)}`}>{pct}%</span>
@@ -319,16 +339,36 @@ export default function Attendance() {
           <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 14, color: '#e6e6e6' }}>Teacher Attendance Summary</h3>
           <div className="att-person-grid">
             {Object.entries(TEACHER_INFO).map(([idStr, info]) => {
-              const id  = +idStr;
-              const pct = attPct(teacherAtt[id] ?? {});
+              const id      = +idStr;
+              const records = teacherAtt[id] ?? {};
+              const pct     = attPct(records);
+              const absentDays = SCHOOL_DAYS.filter(d => records[d.date] === 'Absent');
+              const lateDays   = SCHOOL_DAYS.filter(d => records[d.date] === 'Late');
               return (
-                <div key={id} className="att-person-card">
+                <div key={id} className="att-person-card att-person-card--expand">
                   <div className="att-person-avatar" style={{ background: 'linear-gradient(135deg,#60a5fa,#3b82f6)' }}>{info.name.replace('Dr. ','').replace('Prof. ','').charAt(0)}</div>
                   <div className="att-person-info">
                     <div className="att-person-name">{info.name}</div>
                     <div className="att-person-sub">{info.dept} · ID {id}</div>
                     <div className="att-person-bar-wrap">
                       <div className="att-person-bar" style={{ width: `${pct}%`, background: pct >= 90 ? '#60a5fa' : pct >= 75 ? '#f59e0b' : '#ef4444' }} />
+                    </div>
+                    <div className="att-absent-dates">
+                      {absentDays.length === 0 && lateDays.length === 0
+                        ? <span className="att-no-absence">✓ No absences</span>
+                        : <>
+                            {absentDays.map(d => (
+                              <span key={d.date} className="att-date-chip att-date-chip--absent" title={d.day}>
+                                {new Date(d.date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})}
+                              </span>
+                            ))}
+                            {lateDays.map(d => (
+                              <span key={d.date} className="att-date-chip att-date-chip--late" title={`Late — ${d.day}`}>
+                                {new Date(d.date + 'T00:00:00').toLocaleDateString('en-GB',{day:'numeric',month:'short'})} ⏰
+                              </span>
+                            ))}
+                          </>
+                      }
                     </div>
                   </div>
                   <span className={`badge ${attBadge(pct)}`}>{pct}%</span>

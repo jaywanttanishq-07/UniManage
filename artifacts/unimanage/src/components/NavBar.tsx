@@ -2,7 +2,7 @@ import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Building2,
   CalendarDays, ClipboardList, BarChart3, CreditCard, Library,
-  BedDouble, Bus, Bell, FileText, Settings, CalendarCheck
+  BedDouble, Bus, Bell, FileText, Settings, CalendarCheck, Award
 } from 'lucide-react';
 
 const sections = [
@@ -37,9 +37,10 @@ const sections = [
       { to: '/library',   label: 'Library',   Icon: Library },
       { to: '/hostel',    label: 'Hostel',    Icon: BedDouble },
       { to: '/transport', label: 'Transport', Icon: Bus },
-      { to: '/notices',   label: 'Notices',   Icon: Bell },
-      { to: '/reports',   label: 'Reports',   Icon: FileText },
-      { to: '/settings',  label: 'Settings',  Icon: Settings },
+      { to: '/notices',     label: 'Notices',     Icon: Bell },
+      { to: '/scholarship', label: 'Scholarship', Icon: Award },
+      { to: '/reports',     label: 'Reports',     Icon: FileText },
+      { to: '/settings',    label: 'Settings',    Icon: Settings },
     ],
   },
 ];
