@@ -19,7 +19,7 @@ function randomRGB() {
   return `rgb(${rnd(40, 220)}, ${rnd(30, 220)}, ${rnd(40, 220)})`;
 }
 
-// Light mode: gold (#d4af37) and blue (#1a56db) family
+// Light mode: gold and blue family — shuffled each call so animation is visible
 const LIGHT_PALETTE = [
   'rgb(212,175,55)',   // gold
   'rgb(178,135,37)',   // gold dark
@@ -27,10 +27,14 @@ const LIGHT_PALETTE = [
   'rgb(59,130,246)',   // blue light
   'rgb(234,200,80)',   // pale gold
   'rgb(99,157,245)',   // soft blue
+  'rgb(255,215,0)',    // bright gold
+  'rgb(37,99,235)',    // deep blue
 ];
 
 function lightColors() {
-  return Array.from({ length: POINTS.length }, (_, i) => LIGHT_PALETTE[i % LIGHT_PALETTE.length]);
+  // Shuffle a copy of the palette so each crossfade picks a different arrangement
+  const shuffled = [...LIGHT_PALETTE].sort(() => Math.random() - 0.5);
+  return Array.from({ length: POINTS.length }, (_, i) => shuffled[i % shuffled.length]);
 }
 
 function buildBackground(colors: string[]) {
