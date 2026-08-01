@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useTheme } from '../contexts/ThemeContext';
 
 const POINTS = [
   { pos: '10% 20%', size: '38%' },
@@ -13,8 +14,23 @@ const INTERVAL  = 2200;
 
 function rnd(min: number, max: number) { return Math.floor(Math.random() * (max - min + 1)) + min; }
 
+// Dark mode: random vivid colors
 function randomRGB() {
-  return `rgb(${rnd(40,220)}, ${rnd(30,220)}, ${rnd(40,220)})`;
+  return `rgb(${rnd(40, 220)}, ${rnd(30, 220)}, ${rnd(40, 220)})`;
+}
+
+// Light mode: gold (#d4af37) and blue (#1a56db) family
+const LIGHT_PALETTE = [
+  'rgb(212,175,55)',   // gold
+  'rgb(178,135,37)',   // gold dark
+  'rgb(26,86,219)',    // blue
+  'rgb(59,130,246)',   // blue light
+  'rgb(234,200,80)',   // pale gold
+  'rgb(99,157,245)',   // soft blue
+];
+
+function lightColors() {
+  return Array.from({ length: POINTS.length }, (_, i) => LIGHT_PALETTE[i % LIGHT_PALETTE.length]);
 }
 
 function buildBackground(colors: string[]) {
@@ -22,7 +38,7 @@ function buildBackground(colors: string[]) {
     const c = colors[i % colors.length];
     return `radial-gradient(circle at ${pt.pos}, ${c} 0%, rgba(0,0,0,0) ${pt.size})`;
   });
-  const shine = `radial-gradient(60% 40% at 50% 10%, rgba(255,255,255,0.02), rgba(255,255,255,0) 18%)`;
+  const shine = `radial-gradient(60% 40% at 50% 10%, rgba(255,255,255,0.04), rgba(255,255,255,0) 18%)`;
   return [...layers, shine].join(', ');
 }
 
@@ -30,6 +46,7 @@ export default function MeshBackground() {
   const containerRef  = useRef<HTMLDivElement>(null);
   const currentLayer  = useRef<HTMLDivElement | null>(null);
   const timerRef      = useRef<ReturnType<typeof setInterval> | null>(null);
+  const { theme }     = useTheme();
 
   useEffect(() => {
     const container = containerRef.current;
@@ -43,9 +60,9 @@ export default function MeshBackground() {
         position:absolute; inset:0; width:100%; height:100%;
         background-repeat:no-repeat; background-size:cover;
         opacity:0; pointer-events:none; will-change:opacity;
-        filter:blur(32px) saturate(1.1) hue-rotate(${rnd(-20, 20)}deg);
+        filter:blur(34px) saturate(1.2) hue-rotate(${rnd(-15, 15)}deg);
         transform:scale(1.04);
-        mix-blend-mode:screen;
+        mix-blend-mode:${theme === 'light' ? 'multiply' : 'screen'};
         transition:opacity ${CROSSFADE}ms ease;
       `;
       el.style.backgroundImage = buildBackground(colors);
@@ -62,9 +79,7 @@ export default function MeshBackground() {
       const prev = currentLayer.current;
       if (prev) {
         prev.style.opacity = '0';
-        const cleanup = () => {
-          if (prev.parentNode) prev.parentNode.removeChild(prev);
-        };
+        const cleanup = () => { if (prev.parentNode) prev.parentNode.removeChild(prev); };
         prev.addEventListener('transitionend', function onEnd(e) {
           if ((e as TransitionEvent).propertyName === 'opacity') {
             cleanup();
@@ -77,8 +92,12 @@ export default function MeshBackground() {
     }
 
     function randomColors() {
-      return Array.from({ length: POINTS.length }, () => randomRGB());
+      return theme === 'light' ? lightColors() : Array.from({ length: POINTS.length }, () => randomRGB());
     }
+
+    // Clear old layers on theme switch
+    while (container.firstChild) container.removeChild(container.firstChild);
+    currentLayer.current = null;
 
     if (reduced) {
       const el = createLayer(randomColors());
@@ -93,11 +112,10 @@ export default function MeshBackground() {
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current);
-      // clean up layers
       while (container.firstChild) container.removeChild(container.firstChild);
       currentLayer.current = null;
     };
-  }, []);
+  }, [theme]);
 
   return (
     <div
@@ -107,7 +125,7 @@ export default function MeshBackground() {
         inset: 0,
         zIndex: 0,
         overflow: 'hidden',
-        opacity: 0.22,      // subtle — keeps text legible
+        opacity: theme === 'light' ? 0.35 : 0.22,
         pointerEvents: 'none',
       }}
       aria-hidden="true"

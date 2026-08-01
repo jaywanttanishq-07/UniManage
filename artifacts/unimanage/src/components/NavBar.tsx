@@ -1,15 +1,36 @@
 import { NavLink } from 'react-router-dom';
+import { Sun, Moon } from 'lucide-react';
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Building2,
   CalendarDays, ClipboardList, BarChart3, CreditCard, Library,
-  BedDouble, Bus, Bell, FileText, Settings, CalendarCheck, Award
+  BedDouble, Bus, Bell, FileText, Settings, CalendarCheck, Award,
+  Home,
 } from 'lucide-react';
+import { useTheme } from '../contexts/ThemeContext';
 
-const sections = [
+type NavLinkDef = {
+  to: string;
+  label: string;
+  Icon: React.ComponentType<{ size?: number }>;
+  end?: boolean;
+};
+
+type NavSection = {
+  label: string;
+  links: NavLinkDef[];
+};
+
+const sections: NavSection[] = [
+  {
+    label: 'Site',
+    links: [
+      { to: '/', label: 'Home', Icon: Home, end: true },
+    ],
+  },
   {
     label: 'Main',
     links: [
-      { to: '/', label: 'Dashboard', Icon: LayoutDashboard, end: true },
+      { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, end: true },
     ],
   },
   {
@@ -33,10 +54,10 @@ const sections = [
   {
     label: 'Administration',
     links: [
-      { to: '/fees',      label: 'Fees',      Icon: CreditCard },
-      { to: '/library',   label: 'Library',   Icon: Library },
-      { to: '/hostel',    label: 'Hostel',    Icon: BedDouble },
-      { to: '/transport', label: 'Transport', Icon: Bus },
+      { to: '/fees',        label: 'Fees',        Icon: CreditCard },
+      { to: '/library',     label: 'Library',     Icon: Library },
+      { to: '/hostel',      label: 'Hostel',      Icon: BedDouble },
+      { to: '/transport',   label: 'Transport',   Icon: Bus },
       { to: '/notices',     label: 'Notices',     Icon: Bell },
       { to: '/scholarship', label: 'Scholarship', Icon: Award },
       { to: '/reports',     label: 'Reports',     Icon: FileText },
@@ -46,6 +67,8 @@ const sections = [
 ];
 
 export default function NavBar() {
+  const { theme, toggleTheme } = useTheme();
+
   return (
     <aside className="sidebar">
       <div className="sidebar-brand">
@@ -75,7 +98,18 @@ export default function NavBar() {
         ))}
       </nav>
 
-      <div className="sidebar-footer">© {new Date().getFullYear()} UniManage</div>
+      <div className="sidebar-footer">
+        <button
+          className="theme-toggle-btn"
+          onClick={toggleTheme}
+          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          style={{ marginBottom: 8 }}
+        >
+          {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
+          <span className="theme-toggle-label">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
+        </button>
+        <div>© {new Date().getFullYear()} UniManage</div>
+      </div>
     </aside>
   );
 }
