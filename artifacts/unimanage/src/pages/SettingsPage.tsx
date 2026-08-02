@@ -1,61 +1,39 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth  } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 import { Sun, Moon } from 'lucide-react';
 
 const STORAGE_KEY = 'um-settings';
 
 interface GeneralSettings {
-  uniName: string;
-  address: string;
-  phone: string;
-  email: string;
-  website: string;
-  established: string;
+  uniName: string; address: string; phone: string;
+  email: string;   website: string; established: string;
 }
-
 interface AcademicSettings {
-  currentSemester: string;
-  academicYear: string;
-  gradingSystem: string;
-  attendanceMin: string;
-  finePerDay: string;
+  currentSemester: string; academicYear: string; gradingSystem: string;
+  attendanceMin: string;   finePerDay: string;
 }
-
 interface NotifSettings {
-  emailAlerts: boolean;
-  feeReminders: boolean;
-  examNotices: boolean;
-  libraryDue: boolean;
+  emailAlerts: boolean; feeReminders: boolean;
+  examNotices: boolean; libraryDue: boolean;
 }
-
 interface StoredSettings {
-  general: GeneralSettings;
-  academic: AcademicSettings;
-  notif: NotifSettings;
+  general: GeneralSettings; academic: AcademicSettings; notif: NotifSettings;
 }
 
 const DEFAULTS: StoredSettings = {
   general: {
     uniName: 'UniManage University',
     address: '123 University Road, Bangalore, Karnataka',
-    phone: '+91 80 1234 5678',
-    email: 'admin@unimanage.edu',
-    website: 'https://www.unimanage.edu',
-    established: '1975',
+    phone: '+91 80 1234 5678', email: 'admin@unimanage.edu',
+    website: 'https://www.unimanage.edu', established: '1975',
   },
   academic: {
-    currentSemester: 'Semester 5 — Spring 2026',
-    academicYear: '2025–2026',
-    gradingSystem: 'Percentage',
-    attendanceMin: '75',
-    finePerDay: '500',
+    currentSemester: 'Semester 5 — Spring 2026', academicYear: '2025–2026',
+    gradingSystem: 'Percentage', attendanceMin: '75', finePerDay: '500',
   },
-  notif: {
-    emailAlerts: true,
-    feeReminders: true,
-    examNotices: true,
-    libraryDue: false,
-  },
+  notif: { emailAlerts: true, feeReminders: true, examNotices: true, libraryDue: false },
 };
 
 function loadSettings(): StoredSettings {
@@ -75,14 +53,25 @@ function loadSettings(): StoredSettings {
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
-  const saved_settings = loadSettings();
+  const { adminId, logout, updateCredentials } = useAuth();
+  const navigate = useNavigate();
+  const s = loadSettings();
 
-  const [general, setGeneral] = useState<GeneralSettings>(saved_settings.general);
-  const [academic, setAcademic] = useState<AcademicSettings>(saved_settings.academic);
-  const [notif, setNotif] = useState<NotifSettings>(saved_settings.notif);
-  const [saved, setSaved] = useState(false);
+  // ── General / Academic / Notif state ──────────────────────────────────────
+  const [general,  setGeneral]  = useState<GeneralSettings>(s.general);
+  const [academic, setAcademic] = useState<AcademicSettings>(s.academic);
+  const [notif,    setNotif]    = useState<NotifSettings>(s.notif);
+  const [saved,    setSaved]    = useState(false);
 
-  // Persist any notif toggle immediately
+  // ── Security (change credentials) state ───────────────────────────────────
+  const [newId,      setNewId]      = useState(adminId);
+  const [currentPw,  setCurrentPw]  = useState('');
+  const [newPw,      setNewPw]      = useState('');
+  const [confirmPw,  setConfirmPw]  = useState('');
+  const [showPws,    setShowPws]    = useState(false);
+  const [secMsg,     setSecMsg]     = useState<{ type: 'ok' | 'err'; text: string } | null>(null);
+
+  // Persist notif toggles immediately
   useEffect(() => {
     const current = loadSettings();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ ...current, notif }));
@@ -91,30 +80,52 @@ export default function SettingsPage() {
   function save(e: React.FormEvent) {
     e.preventDefault();
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ general, academic, notif }));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setSaved(true); setTimeout(() => setSaved(false), 2500);
   }
-
   function resetToDefaults() {
-    setGeneral({ ...DEFAULTS.general });
-    setAcademic({ ...DEFAULTS.academic });
-    setNotif({ ...DEFAULTS.notif });
+    setGeneral({ ...DEFAULTS.general }); setAcademic({ ...DEFAULTS.academic }); setNotif({ ...DEFAULTS.notif });
     localStorage.setItem(STORAGE_KEY, JSON.stringify(DEFAULTS));
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2500);
+    setSaved(true); setTimeout(() => setSaved(false), 2500);
+  }
+  function chG(e: React.ChangeEvent<HTMLInputElement>) { setGeneral(g => ({ ...g, [e.target.name]: e.target.value })); }
+  function chA(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) { setAcademic(a => ({ ...a, [e.target.name]: e.target.value })); }
+  function chN(key: keyof NotifSettings) { setNotif(n => ({ ...n, [key]: !n[key] })); }
+
+  function saveCredentials(e: React.FormEvent) {
+    e.preventDefault();
+    setSecMsg(null);
+    if (newPw !== confirmPw) { setSecMsg({ type: 'err', text: 'New passwords do not match.' }); return; }
+    const err = updateCredentials(currentPw, newId, newPw);
+    if (err) { setSecMsg({ type: 'err', text: err }); }
+    else {
+      setSecMsg({ type: 'ok', text: 'Credentials updated successfully.' });
+      setCurrentPw(''); setNewPw(''); setConfirmPw('');
+      setTimeout(() => setSecMsg(null), 3000);
+    }
   }
 
-  function chG(e: React.ChangeEvent<HTMLInputElement>) {
-    setGeneral(g => ({ ...g, [e.target.name]: e.target.value }));
+  function handleLogout() {
+    logout();
+    navigate('/dashboard');
   }
 
-  function chA(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
-    setAcademic(a => ({ ...a, [e.target.name]: e.target.value }));
-  }
-
-  function chN(key: keyof NotifSettings) {
-    setNotif(n => ({ ...n, [key]: !n[key] }));
-  }
+  const Toggle = ({ checked, onChange }: { checked: boolean; onChange: () => void }) => (
+    <button
+      type="button" role="switch" aria-checked={checked} onClick={onChange}
+      style={{
+        width: 44, height: 24, borderRadius: 12, cursor: 'pointer', border: 'none', outline: 'none', flexShrink: 0,
+        background: checked ? 'linear-gradient(90deg, var(--gold), var(--gold-dark))' : 'var(--toggle-off-bg)',
+        position: 'relative', transition: 'background .2s',
+      }}
+    >
+      <div style={{
+        position: 'absolute', top: 3, left: checked ? 22 : 3,
+        width: 18, height: 18, borderRadius: '50%',
+        background: checked ? '#071017' : 'var(--toggle-knob)',
+        transition: 'left .2s',
+      }} />
+    </button>
+  );
 
   return (
     <section className="container">
@@ -124,53 +135,22 @@ export default function SettingsPage() {
           <p className="muted">Configure university preferences and system options.</p>
         </div>
         {saved && (
-          <span className="badge badge-green" style={{ padding: '8px 16px', fontSize: 13 }}>
-            ✓ Changes saved
-          </span>
+          <span className="badge badge-green" style={{ padding: '8px 16px', fontSize: 13 }}>✓ Changes saved</span>
         )}
       </header>
 
       <form onSubmit={save}>
-
-        {/* Appearance */}
-        <div className="content-card">
-          <div className="settings-group">
-            <h3>Appearance</h3>
-            <div className="settings-row" style={{ alignItems: 'center' }}>
-              <label>Theme</label>
-              <div style={{ display: 'flex', gap: 10 }}>
-                <button
-                  type="button"
-                  className={theme === 'dark' ? 'btn-gold' : 'btn-muted'}
-                  style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 16px', fontSize: 13 }}
-                  onClick={() => { if (theme !== 'dark') toggleTheme(); }}
-                >
-                  <Moon size={14} /> Dark
-                </button>
-                <button
-                  type="button"
-                  className={theme === 'light' ? 'btn-gold' : 'btn-muted'}
-                  style={{ display: 'flex', alignItems: 'center', gap: 7, padding: '8px 16px', fontSize: 13 }}
-                  onClick={() => { if (theme !== 'light') toggleTheme(); }}
-                >
-                  <Sun size={14} /> Light
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* General */}
+        {/* ── General Information ─────────────────────────────────────────── */}
         <div className="content-card">
           <div className="settings-group">
             <h3>General Information</h3>
             {([
-              ['uniName',    'University Name',  'text'],
-              ['address',    'Address',          'text'],
-              ['phone',      'Phone Number',     'tel'],
-              ['email',      'Email Address',    'email'],
-              ['website',    'Website URL',      'url'],
-              ['established','Year Established', 'text'],
+              ['uniName',     'University Name',  'text'],
+              ['address',     'Address',          'text'],
+              ['phone',       'Phone Number',      'tel'],
+              ['email',       'Email Address',     'email'],
+              ['website',     'Website URL',       'url'],
+              ['established', 'Established Year',  'number'],
             ] as [keyof GeneralSettings, string, string][]).map(([name, label, type]) => (
               <div key={name} className="settings-row">
                 <label>{label}</label>
@@ -180,10 +160,10 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        {/* Academic */}
+        {/* ── Academic ────────────────────────────────────────────────────── */}
         <div className="content-card">
           <div className="settings-group">
-            <h3>Academic Configuration</h3>
+            <h3>Academic Settings</h3>
             <div className="settings-row">
               <label>Current Semester</label>
               <input name="currentSemester" value={academic.currentSemester} onChange={chA} />
@@ -195,23 +175,49 @@ export default function SettingsPage() {
             <div className="settings-row">
               <label>Grading System</label>
               <select name="gradingSystem" value={academic.gradingSystem} onChange={chA}>
-                {['Percentage', 'GPA (4.0)', 'GPA (10.0)', 'Letter Grade'].map(g => (
-                  <option key={g}>{g}</option>
-                ))}
+                <option>Percentage</option>
+                <option>GPA (10-point)</option>
+                <option>GPA (4-point)</option>
               </select>
             </div>
             <div className="settings-row">
               <label>Minimum Attendance (%)</label>
-              <input name="attendanceMin" value={academic.attendanceMin} onChange={chA} type="number" min={0} max={100} />
+              <input name="attendanceMin" type="number" min={0} max={100} value={academic.attendanceMin} onChange={chA} />
             </div>
             <div className="settings-row">
               <label>Late Fee Fine (₹ per day)</label>
-              <input name="finePerDay" value={academic.finePerDay} onChange={chA} type="number" min={0} />
+              <input name="finePerDay" type="number" min={0} value={academic.finePerDay} onChange={chA} />
             </div>
           </div>
         </div>
 
-        {/* Notifications */}
+        {/* ── Appearance ──────────────────────────────────────────────────── */}
+        <div className="content-card">
+          <div className="settings-group">
+            <h3>Appearance</h3>
+            <p className="muted" style={{ fontSize: 13, marginBottom: 14 }}>Choose between dark and light theme.</p>
+            <div style={{ display: 'flex', gap: 10 }}>
+              <button
+                type="button"
+                onClick={() => theme !== 'dark' && toggleTheme()}
+                className={theme === 'dark' ? 'btn-gold' : 'btn-muted'}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Moon size={14} /> Dark
+              </button>
+              <button
+                type="button"
+                onClick={() => theme !== 'light' && toggleTheme()}
+                className={theme === 'light' ? 'btn-gold' : 'btn-muted'}
+                style={{ display: 'flex', alignItems: 'center', gap: 6 }}
+              >
+                <Sun size={14} /> Light
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* ── Notifications ───────────────────────────────────────────────── */}
         <div className="content-card">
           <div className="settings-group">
             <h3>Notification Preferences</h3>
@@ -223,34 +229,102 @@ export default function SettingsPage() {
             ] as [keyof NotifSettings, string][]).map(([key, label]) => (
               <div key={key} style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 14, maxWidth: 440 }}>
                 <span style={{ fontSize: 13 }}>{label}</span>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={notif[key]}
-                  onClick={() => chN(key)}
-                  style={{
-                    width: 44, height: 24, borderRadius: 12, cursor: 'pointer', border: 'none', outline: 'none',
-                    background: notif[key] ? 'linear-gradient(90deg, var(--gold), var(--gold-dark))' : 'var(--toggle-off-bg)',
-                    position: 'relative', transition: 'background .2s', flexShrink: 0,
-                  }}
-                >
-                  <div style={{
-                    position: 'absolute', top: 3, left: notif[key] ? 22 : 3,
-                    width: 18, height: 18, borderRadius: '50%',
-                    background: notif[key] ? '#071017' : 'var(--toggle-knob)',
-                    transition: 'left .2s',
-                  }} />
-                </button>
+                <Toggle checked={notif[key]} onChange={() => chN(key)} />
               </div>
             ))}
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: 12 }}>
+        <div style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
           <button type="submit" className="btn-gold">Save Changes</button>
           <button type="button" className="btn-muted" onClick={resetToDefaults}>Reset to Defaults</button>
         </div>
       </form>
+
+      {/* ── Security — change credentials ───────────────────────────────── */}
+      <div className="content-card" style={{ marginBottom: 16 }}>
+        <form onSubmit={saveCredentials}>
+          <div className="settings-group">
+            <h3>🔐 Security — Change Login Credentials</h3>
+            <p className="muted" style={{ fontSize: 13, marginBottom: 18 }}>
+              Currently signed in as <strong style={{ color: 'var(--gold)' }}>{adminId}</strong>.
+              Enter your current password to make changes.
+            </p>
+
+            <div className="settings-row">
+              <label>New Admin ID</label>
+              <input
+                type="text"
+                value={newId}
+                onChange={e => setNewId(e.target.value)}
+                placeholder="New login ID"
+                autoComplete="username"
+              />
+            </div>
+            <div className="settings-row">
+              <label>Current Password</label>
+              <input
+                type={showPws ? 'text' : 'password'}
+                value={currentPw}
+                onChange={e => setCurrentPw(e.target.value)}
+                placeholder="Your current password"
+                autoComplete="current-password"
+              />
+            </div>
+            <div className="settings-row">
+              <label>New Password</label>
+              <input
+                type={showPws ? 'text' : 'password'}
+                value={newPw}
+                onChange={e => setNewPw(e.target.value)}
+                placeholder="At least 6 characters"
+                autoComplete="new-password"
+              />
+            </div>
+            <div className="settings-row">
+              <label>Confirm New Password</label>
+              <input
+                type={showPws ? 'text' : 'password'}
+                value={confirmPw}
+                onChange={e => setConfirmPw(e.target.value)}
+                placeholder="Repeat new password"
+                autoComplete="new-password"
+              />
+            </div>
+
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, cursor: 'pointer', marginBottom: 16 }}>
+              <input type="checkbox" checked={showPws} onChange={() => setShowPws(v => !v)} />
+              Show passwords
+            </label>
+
+            {secMsg && (
+              <p style={{
+                padding: '8px 14px', borderRadius: 8, fontSize: 13, marginBottom: 14,
+                background: secMsg.type === 'ok' ? 'rgba(34,197,94,0.12)' : 'rgba(239,68,68,0.12)',
+                color: secMsg.type === 'ok' ? '#22c55e' : '#ef4444',
+                border: `1px solid ${secMsg.type === 'ok' ? 'rgba(34,197,94,0.3)' : 'rgba(239,68,68,0.3)'}`,
+              }}>
+                {secMsg.type === 'ok' ? '✓' : '✕'} {secMsg.text}
+              </p>
+            )}
+
+            <button type="submit" className="btn-gold">Update Credentials</button>
+          </div>
+        </form>
+      </div>
+
+      {/* ── Logout ──────────────────────────────────────────────────────── */}
+      <div className="content-card" style={{ marginBottom: 40 }}>
+        <div className="settings-group">
+          <h3>Session</h3>
+          <p className="muted" style={{ fontSize: 13, marginBottom: 16 }}>
+            Sign out of this device. You will need your ID and password to sign back in.
+          </p>
+          <button type="button" className="btn-danger" onClick={handleLogout}>
+            Sign Out
+          </button>
+        </div>
+      </div>
     </section>
   );
 }

@@ -1,5 +1,5 @@
-import { NavLink } from 'react-router-dom';
-import { Sun, Moon } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Sun, Moon, LogOut } from 'lucide-react';
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Building2,
   CalendarDays, ClipboardList, BarChart3, CreditCard, Library,
@@ -7,6 +7,7 @@ import {
   Home,
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
+import { useAuth  } from '../contexts/AuthContext';
 
 type NavLinkDef = {
   to: string;
@@ -68,9 +69,17 @@ const sections: NavSection[] = [
 
 export default function NavBar() {
   const { theme, toggleTheme } = useTheme();
+  const { logout, adminId }    = useAuth();
+  const navigate = useNavigate();
+
+  function handleLogout() {
+    logout();
+    navigate('/dashboard');   // will hit the auth guard and show LoginPage
+  }
 
   return (
     <aside className="sidebar">
+      {/* Brand */}
       <div className="sidebar-brand">
         <div className="logo-mark" aria-hidden="true">UM</div>
         <div>
@@ -79,6 +88,7 @@ export default function NavBar() {
         </div>
       </div>
 
+      {/* Scrollable nav */}
       <nav className="sidebar-nav" aria-label="Main">
         {sections.map(({ label, links }) => (
           <div key={label}>
@@ -98,17 +108,33 @@ export default function NavBar() {
         ))}
       </nav>
 
+      {/* Footer */}
       <div className="sidebar-footer">
+        {/* Logged-in admin badge */}
+        <div className="sidebar-admin-badge">
+          <span className="sidebar-admin-dot" />
+          <span className="sidebar-admin-id">{adminId}</span>
+        </div>
+
+        {/* Theme toggle */}
         <button
           className="theme-toggle-btn"
           onClick={toggleTheme}
           title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
-          style={{ marginBottom: 8 }}
         >
           {theme === 'dark' ? <Sun size={15} /> : <Moon size={15} />}
           <span className="theme-toggle-label">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </button>
-        <div>© {new Date().getFullYear()} UniManage</div>
+
+        {/* Logout button */}
+        <button
+          className="logout-btn"
+          onClick={handleLogout}
+          title="Sign out"
+        >
+          <LogOut size={15} />
+          <span className="theme-toggle-label">Sign Out</span>
+        </button>
       </div>
     </aside>
   );
