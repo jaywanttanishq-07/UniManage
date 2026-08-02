@@ -910,8 +910,9 @@ select option { background: var(--panel); color: var(--text); }
   .grid-4 { grid-template-columns: 1fr 1fr; }
 
   /* Tables — horizontal scroll */
-  .table-wrap, .table-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .uni-table { min-width: 480px; }
+  /* table-card now has overflow-x:auto at base level; keep min-width generous
+     so 8–9 column tables are readable before the scroll kicks in */
+  .uni-table { min-width: 680px; }
   table      { min-width: 480px; }
 
   /* Timetable → horizontal scroll */
@@ -1075,7 +1076,12 @@ select option { background: var(--panel); color: var(--text); }
   background: var(--card-bg);
   border: 1px solid var(--card-border);
   border-radius: var(--radius);
-  overflow: hidden;
+  /* overflow-x: auto here (not hidden) so tables scroll horizontally on any
+     viewport. overflow: hidden was coming AFTER the media queries in the file,
+     causing the mobile scroll fix to be silently overridden. */
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 16px;
 }
 .uni-table { width: 100%; border-collapse: collapse; font-size: 13px; }
