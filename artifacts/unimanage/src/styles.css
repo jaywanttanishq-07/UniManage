@@ -462,20 +462,94 @@ select option { background: var(--panel); color: var(--text); }
 .chart-bar-val   { font-size: 12px; color: var(--text); min-width: 32px; text-align: right; }
 
 /* ── Timetable ── */
-.timetable-grid { display: grid; grid-template-columns: 80px repeat(5, 1fr); gap: 6px; }
-.tt-head { font-size: 11px; font-weight: 700; text-align: center; padding: 8px 4px; color: var(--muted); text-transform: uppercase; letter-spacing: .07em; }
-.tt-time { font-size: 11px; color: var(--muted); display: flex; align-items: center; justify-content: flex-end; padding-right: 8px; }
-.tt-cell {
-  background: var(--card-bg);
-  border: 1px solid var(--card-border);
-  border-radius: 8px;
-  padding: 8px 10px;
-  min-height: 60px;
-  display: flex; flex-direction: column; justify-content: center;
+
+/* Scroll wrapper — lets the table scroll horizontally on small screens */
+.tt-scroll-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
 }
-.tt-cell-empty { background: var(--glass); border: 1px dashed var(--card-border); border-radius: 8px; min-height: 60px; }
+
+/* The table itself */
+.tt-table {
+  width: 100%;
+  min-width: 540px;        /* ensures day columns are readable before scroll kicks in */
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+/* Column headers */
+.tt-th {
+  padding: 12px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .07em;
+  border-bottom: 2px solid var(--card-border);
+  white-space: nowrap;
+  background: var(--card-bg);
+}
+.tt-th-period {
+  text-align: left;
+  color: var(--muted);
+  width: 90px;
+  min-width: 90px;
+}
+/* Day headers — gold */
+.tt-th-day {
+  text-align: center;
+  color: var(--gold);
+}
+
+/* Row striping */
+.tt-row:nth-child(even) .tt-td { background: var(--glass); }
+
+/* All data cells */
+.tt-td {
+  padding: 10px 8px;
+  vertical-align: middle;
+  border-bottom: 1px solid var(--card-border);
+}
+.tt-td-period {
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  white-space: nowrap;
+}
+.tt-td-slot {
+  text-align: center;
+  cursor: pointer;
+  transition: background .15s;
+  border-left: 1px solid var(--card-border);
+}
+.tt-td-slot:hover { background: color-mix(in srgb, var(--gold) 8%, transparent); }
+
+/* Filled slot */
+.tt-td-filled { }
+.tt-subject {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--gold);
+}
+.tt-room {
+  display: block;
+  font-size: 10.5px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+/* Empty slot */
+.tt-td-empty { }
+.tt-empty-dash {
+  color: rgba(207,207,207,0.2);
+  font-size: 11px;
+}
+
+/* legacy aliases kept in case other components reference them */
 .tt-course { font-size: 12px; font-weight: 600; color: var(--gold); }
-.tt-room   { font-size: 11px; color: var(--muted); margin-top: 2px; }
+.tt-cell   { padding: 8px 10px; }
+.tt-head   { color: var(--gold); font-weight: 700; }
 
 /* ── Reports / Full-page report card ── */
 .fc-report-card {
@@ -808,8 +882,9 @@ select option { background: var(--panel); color: var(--text); }
 @media (max-width: 1024px) {
   .container { padding: 20px 18px 40px; }
   .grid-4 { grid-template-columns: 1fr 1fr; }
-  .timetable-grid { grid-template-columns: 60px repeat(5, 1fr); font-size: 11px; }
-  .tt-cell { padding: 6px 8px; min-height: 50px; }
+  .tt-table { font-size: 11px; }
+  .tt-td { padding: 8px 6px; }
+  .tt-th { padding: 10px 6px; }
   .home-features-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
   .about-story-grid { gap: 24px; }
 }
@@ -840,7 +915,7 @@ select option { background: var(--panel); color: var(--text); }
   table      { min-width: 480px; }
 
   /* Timetable → horizontal scroll */
-  .timetable-grid { min-width: 560px; }
+  .tt-table { min-width: 480px; }
 
   /* Public pages */
   .about-story-grid, .contact-grid { grid-template-columns: 1fr; }
@@ -908,9 +983,11 @@ select option { background: var(--panel); color: var(--text); }
   .course-grid, .dept-grid, .scholar-grid { grid-template-columns: 1fr; }
 
   /* Timetable → scroll container */
-  .timetable-grid { font-size: 10px; gap: 4px; }
-  .tt-cell { padding: 4px 6px; min-height: 44px; }
-  .tt-course { font-size: 10px; }
+  .tt-table { font-size: 10px; min-width: 420px; }
+  .tt-td { padding: 6px 5px; }
+  .tt-subject { font-size: 10px; }
+  .tt-room { font-size: 9.5px; }
+  .tt-th-period { width: 72px; min-width: 72px; }
 
   /* Footer */
   .home-footer-inner { flex-direction: column; gap: 10px; }
