@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Book { id: number; title: string; author: string; isbn: string; category: string; copies: number; available: number; borrowedBy?: string; }
 
@@ -16,6 +17,8 @@ const INITIAL: Book[] = [
 const blank: Book = { id:0, title:'', author:'', isbn:'', category:'', copies:1, available:1 };
 
 export default function LibraryPage() {
+  const { role } = useAuth();
+  const canManage = role === 'admin' || role === 'teacher';
   const [list, setList] = useState<Book[]>(INITIAL);
   const [q, setQ] = useState('');
   const [show, setShow] = useState(false);
@@ -59,7 +62,7 @@ export default function LibraryPage() {
         <div><h1>Library</h1><p className="muted">Book catalogue, issue and return management.</p></div>
         <div className="toolbar">
           <input className="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search title, author, category…" />
-          <button className="btn-gold" onClick={openAdd}>+ Add Book</button>
+          {canManage && <button className="btn-gold" onClick={openAdd}>+ Add Book</button>}
         </div>
       </header>
 
@@ -71,10 +74,10 @@ export default function LibraryPage() {
 
       <div className="table-card">
         <table className="uni-table">
-          <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Copies</th><th>Available</th><th>Issued To</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Copies</th><th>Available</th>{canManage && <><th>Issued To</th><th>Actions</th></>}</tr></thead>
           <tbody>
             {filtered.length === 0
-              ? <tr className="empty-row"><td colSpan={7}>No books found</td></tr>
+              ? <tr className="empty-row"><td colSpan={canManage ? 7 : 5}>No books found</td></tr>
               : filtered.map(b => (
                 <tr key={b.id}>
                   <td style={{ fontWeight: 600 }}>{b.title}</td>
@@ -86,21 +89,21 @@ export default function LibraryPage() {
                       {b.available}/{b.copies}
                     </span>
                   </td>
-                  <td className="muted">{b.borrowedBy ?? '—'}</td>
-                  <td style={{ display: 'flex', gap: 6 }}>
+                  {canManage && <td className="muted">{b.borrowedBy ?? '—'}</td>}
+                  {canManage && <td style={{ display: 'flex', gap: 6 }}>
                     {b.available > 0
                       ? <button className="btn-gold btn-sm" onClick={() => { setIssueModal(b); setBorrower(''); }}>Issue</button>
                       : <button className="btn-muted btn-sm" onClick={() => returnBook(b.id)}>Return</button>}
                     <button className="btn-muted btn-sm" onClick={() => openEdit(b)}>Edit</button>
                     <button className="btn-danger" onClick={() => del(b.id)}>Delete</button>
-                  </td>
+                  </td>}
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
 
-      {show && (
+      {canManage && show && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={save}>
             <h3>{editing ? 'Edit Book' : 'Add Book'}</h3>
@@ -118,7 +121,7 @@ export default function LibraryPage() {
         </div>
       )}
 
-      {issueModal && (
+      {canManage && issueModal && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={issueBook} style={{ minWidth: 300 }}>
             <h3>Issue Book</h3>

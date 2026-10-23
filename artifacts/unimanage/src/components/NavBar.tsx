@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { Sun, Moon, LogOut } from 'lucide-react';
+import { Sun, Moon, LogIn, LogOut } from 'lucide-react';
 import {
   LayoutDashboard, Users, GraduationCap, BookOpen, Building2,
   CalendarDays, ClipboardList, BarChart3, CreditCard, Library,
@@ -7,7 +7,7 @@ import {
   Home,
 } from 'lucide-react';
 import { useTheme } from '../contexts/ThemeContext';
-import { useAuth  } from '../contexts/AuthContext';
+import { canAccessRoute, useAuth } from '../contexts/AuthContext';
 
 type NavLinkDef = {
   to: string;
@@ -69,13 +69,22 @@ const sections: NavSection[] = [
 
 export default function NavBar() {
   const { theme, toggleTheme } = useTheme();
-  const { logout, adminId }    = useAuth();
+  const { logout, role, userId } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
     logout();
-    navigate('/dashboard');   // will hit the auth guard and show LoginPage
+    navigate('/dashboard');
   }
+
+  const visibleSections = sections
+    .map(section => ({
+      ...section,
+      links: section.links.filter(link =>
+        link.to === '/' || canAccessRoute(role, link.to),
+      ),
+    }))
+    .filter(section => section.links.length > 0);
 
   return (
     <aside className="sidebar">
@@ -90,7 +99,7 @@ export default function NavBar() {
 
       {/* Scrollable nav */}
       <nav className="sidebar-nav" aria-label="Main">
-        {sections.map(({ label, links }) => (
+        {visibleSections.map(({ label, links }) => (
           <div key={label}>
             <div className="sidebar-section-label">{label}</div>
             {links.map(({ to, label: lbl, Icon, end }) => (
@@ -111,10 +120,12 @@ export default function NavBar() {
       {/* Footer */}
       <div className="sidebar-footer">
         {/* Logged-in admin badge */}
-        <div className="sidebar-admin-badge">
-          <span className="sidebar-admin-dot" />
-          <span className="sidebar-admin-id">{adminId}</span>
-        </div>
+        {role && (
+          <div className="sidebar-admin-badge" title={`${role}: ${userId}`}>
+            <span className="sidebar-admin-dot" />
+            <span className="sidebar-admin-id">{userId}</span>
+          </div>
+        )}
 
         {/* Theme toggle */}
         <button
@@ -126,15 +137,17 @@ export default function NavBar() {
           <span className="theme-toggle-label">{theme === 'dark' ? 'Light Mode' : 'Dark Mode'}</span>
         </button>
 
-        {/* Logout button */}
-        <button
-          className="logout-btn"
-          onClick={handleLogout}
-          title="Sign out"
-        >
-          <LogOut size={15} />
-          <span className="theme-toggle-label">Sign Out</span>
-        </button>
+        {role ? (
+          <button className="logout-btn" onClick={handleLogout} title="Sign out">
+            <LogOut size={15} />
+            <span className="theme-toggle-label">Sign Out</span>
+          </button>
+        ) : (
+          <button className="theme-toggle-btn" onClick={() => navigate('/dashboard')} title="Staff sign in">
+            <LogIn size={15} />
+            <span className="theme-toggle-label">Staff Sign In</span>
+          </button>
+        )}
       </div>
     </aside>
   );

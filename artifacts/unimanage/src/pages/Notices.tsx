@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Notice { id: number; title: string; category: string; date: string; content: string; priority: string; author: string; }
 
@@ -16,6 +17,8 @@ const priorityBadge: Record<string, string> = { High: 'badge-red', Medium: 'badg
 const blank: Notice = { id:0, title:'', category:'General', date:'', content:'', priority:'Medium', author:'' };
 
 export default function Notices() {
+  const { role } = useAuth();
+  const canManage = role === 'admin' || role === 'teacher';
   const [list, setList] = useState<Notice[]>(INITIAL);
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState('All');
@@ -50,7 +53,7 @@ export default function Notices() {
         <div><h1>Notices</h1><p className="muted">University announcements and circulars.</p></div>
         <div className="toolbar">
           <input className="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search notices…" />
-          <button className="btn-gold" onClick={openAdd}>+ Post Notice</button>
+          {canManage && <button className="btn-gold" onClick={openAdd}>+ Post Notice</button>}
         </div>
       </header>
 
@@ -73,8 +76,10 @@ export default function Notices() {
             </div>
             <div style={{ display: 'flex', gap: 6, alignItems: 'center', flexShrink: 0 }}>
               <span className={`badge ${priorityBadge[n.priority]}`}>{n.priority}</span>
-              <button className="btn-muted btn-sm" onClick={e => { e.stopPropagation(); openEdit(n); }}>Edit</button>
-              <button className="btn-danger" onClick={e => { e.stopPropagation(); del(n.id); }}>Delete</button>
+              {canManage && <>
+                <button className="btn-muted btn-sm" onClick={e => { e.stopPropagation(); openEdit(n); }}>Edit</button>
+                <button className="btn-danger" onClick={e => { e.stopPropagation(); del(n.id); }}>Delete</button>
+              </>}
             </div>
           </div>
           <p style={{ margin: '8px 0 0', fontSize: 13, color: 'rgba(207,207,207,0.5)', lineHeight: 1.5 }}>
@@ -101,7 +106,7 @@ export default function Notices() {
       )}
 
       {/* Edit/Add Modal */}
-      {show && (
+      {canManage && show && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={save} style={{ maxWidth: 500 }}>
             <h3>{editing ? 'Edit Notice' : 'Post Notice'}</h3>

@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Exam { id: number; subject: string; code: string; date: string; time: string; room: string; duration: string; type: string; }
 
@@ -15,6 +16,8 @@ const INITIAL: Exam[] = [
 const blank: Exam = { id: 0, subject: '', code: '', date: '', time: '09:00', room: '', duration: '3 hrs', type: 'Mid-Term' };
 
 export default function Exams() {
+  const { role } = useAuth();
+  const canManage = role === 'admin' || role === 'teacher';
   const [list, setList] = useState<Exam[]>(INITIAL);
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState('All');
@@ -49,16 +52,16 @@ export default function Exams() {
           {(['All','Mid-Term','Final'] as const).map(t => (
             <button key={t} className={filter === t ? 'btn-gold btn-sm' : 'btn-muted btn-sm'} onClick={() => setFilter(t)}>{t}</button>
           ))}
-          <button className="btn-gold" onClick={openAdd}>+ Add Exam</button>
+          {canManage && <button className="btn-gold" onClick={openAdd}>+ Add Exam</button>}
         </div>
       </header>
 
       <div className="table-card">
         <table className="uni-table">
-          <thead><tr><th>Subject</th><th>Code</th><th>Date</th><th>Time</th><th>Room</th><th>Duration</th><th>Type</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Subject</th><th>Code</th><th>Date</th><th>Time</th><th>Room</th><th>Duration</th><th>Type</th>{canManage && <th>Actions</th>}</tr></thead>
           <tbody>
             {filtered.length === 0
-              ? <tr className="empty-row"><td colSpan={8}>No exams found</td></tr>
+              ? <tr className="empty-row"><td colSpan={canManage ? 8 : 7}>No exams found</td></tr>
               : filtered.map(ex => (
                 <tr key={ex.id}>
                   <td style={{ fontWeight: 600 }}>{ex.subject}</td>
@@ -68,17 +71,17 @@ export default function Exams() {
                   <td>{ex.room}</td>
                   <td>{ex.duration}</td>
                   <td><span className={`badge ${ex.type === 'Final' ? 'badge-red' : 'badge-yellow'}`}>{ex.type}</span></td>
-                  <td style={{ display: 'flex', gap: 6 }}>
+                  {canManage && <td style={{ display: 'flex', gap: 6 }}>
                     <button className="btn-muted btn-sm" onClick={() => openEdit(ex)}>Edit</button>
                     <button className="btn-danger" onClick={() => del(ex.id)}>Delete</button>
-                  </td>
+                  </td>}
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
 
-      {show && (
+      {canManage && show && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={save}>
             <h3>{editing ? 'Edit Exam' : 'Add Exam'}</h3>

@@ -308,17 +308,19 @@ body {
   font-weight: 600;
   margin: 0 0 6px;
 }
-.login-hint {
-  font-size: 12px;
-  color: var(--muted);
-  margin: 0 0 28px;
-}
 .login-form {
   display: flex;
   flex-direction: column;
   gap: 16px;
   text-align: left;
 }
+.login-role-picker {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 20px 0;
+}
+.login-role-picker button { padding: 10px 8px; }
 .login-field {
   display: flex;
   flex-direction: column;
@@ -344,18 +346,6 @@ body {
   box-sizing: border-box;
 }
 .login-field input:focus { border-color: var(--gold); }
-
-.login-pw-wrap { position: relative; }
-.login-pw-wrap input { padding-right: 42px; }
-.login-eye {
-  position: absolute;
-  right: 10px; top: 50%;
-  transform: translateY(-50%);
-  background: none; border: none;
-  cursor: pointer; font-size: 16px;
-  padding: 2px 4px;
-  line-height: 1;
-}
 
 .login-error {
   font-size: 12.5px;
@@ -388,6 +378,10 @@ body {
   font-size: 11.5px;
   color: var(--muted);
   opacity: .7;
+}
+
+@media (max-width: 600px) {
+  .login-card { padding: 32px 22px 26px; }
 }
 
 /* ── Container (page entrance) ── */
@@ -1065,8 +1059,11 @@ select option { background: var(--panel); color: var(--text); }
   /* Sidebar → icon-only rail */
   .sidebar { width: 52px; min-width: 52px; }
   .brand-title, .brand-sub, .nav-link span,
-  .sidebar-section-label, .sidebar-footer,
-  .theme-toggle-label { display: none; }
+  .sidebar-section-label, .theme-toggle-label { display: none; }
+  .sidebar-footer { display: flex; padding: 8px 4px; opacity: 1; }
+  .sidebar-admin-badge { justify-content: center; padding: 6px 4px; }
+  .sidebar-admin-id { display: none; }
+  .theme-toggle-btn, .logout-btn { justify-content: center; padding: 8px; }
   .nav-link { justify-content: center; padding: 10px; }
   .nav-link svg { opacity: .8; }
   .sidebar-brand { justify-content: center; padding: 14px 6px; }
@@ -1256,6 +1253,7 @@ select option { background: var(--panel); color: var(--text); }
   margin-bottom: 16px;
 }
 .uni-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.student-directory-readonly .uni-table { min-width: 100%; }
 .uni-table thead th {
   text-align: left;
   padding: 10px 14px;

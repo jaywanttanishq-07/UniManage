@@ -7,7 +7,11 @@ import { defineConfig } from 'vite';
 const isReplit = process.env.REPL_ID !== undefined;
 
 // Safe defaults so the project works in VS Code / local dev without any .env
-const port = Number(process.env.PORT ?? 5173);
+const port = Number(
+  process.env.VITE_PORT ??
+    (process.env.REPL_ID ? process.env.PORT : undefined) ??
+    5173,
+);
 const basePath = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({

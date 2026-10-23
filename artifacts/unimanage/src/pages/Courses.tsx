@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Course { id: string; name: string; dept: string; credits: number; instructor: string; students: number; status: string; }
 
@@ -28,6 +29,8 @@ const blank: Course = { id: '', name: '', dept: '', credits: 3, instructor: '', 
 const DEPTS = ['Computer Science', 'Mechanical Eng.', 'Biology', 'Business', 'Mathematics', 'Chemistry'];
 
 export default function Courses() {
+  const { role } = useAuth();
+  const canManage = role === 'admin' || role === 'teacher';
   const [list, setList]     = useState<Course[]>(INITIAL);
   const [q, setQ]           = useState('');
   const [deptFilter, setDeptFilter] = useState('All');
@@ -69,7 +72,7 @@ export default function Courses() {
         <div><h1>Courses</h1><p className="muted">Manage course catalogue grouped by department.</p></div>
         <div className="toolbar">
           <input className="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search name, code…" />
-          <button className="btn-gold" onClick={openAdd}>+ Add Course</button>
+          {canManage && <button className="btn-gold" onClick={openAdd}>+ Add Course</button>}
         </div>
       </header>
 
@@ -111,17 +114,19 @@ export default function Courses() {
                   <span>⭐ {c.credits} credits</span>
                   <span>👥 {c.students} students</span>
                 </div>
-                <div className="course-card-actions">
-                  <button className="btn-muted btn-sm" onClick={() => openEdit(c)}>Edit</button>
-                  <button className="btn-danger" onClick={() => del(c.id)}>Delete</button>
-                </div>
+                {canManage && (
+                  <div className="course-card-actions">
+                    <button className="btn-muted btn-sm" onClick={() => openEdit(c)}>Edit</button>
+                    <button className="btn-danger" onClick={() => del(c.id)}>Delete</button>
+                  </div>
+                )}
               </div>
             ))}
           </div>
         </div>
       ))}
 
-      {show && (
+      {canManage && show && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={save}>
             <h3>{editing ? 'Edit Course' : 'Add Course'}</h3>

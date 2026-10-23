@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth  } from '../contexts/AuthContext';
+import type { UserRole } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { Sun, Moon } from 'lucide-react';
 
@@ -53,7 +54,7 @@ function loadSettings(): StoredSettings {
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
-  const { adminId, logout, updateCredentials } = useAuth();
+  const { userId, logout, updateCredentials } = useAuth();
   const navigate = useNavigate();
   const s = loadSettings();
 
@@ -64,7 +65,8 @@ export default function SettingsPage() {
   const [saved,    setSaved]    = useState(false);
 
   // ── Security (change credentials) state ───────────────────────────────────
-  const [newId,      setNewId]      = useState(adminId);
+  const [accountRole, setAccountRole] = useState<UserRole>('admin');
+  const [newId,      setNewId]      = useState(userId);
   const [currentPw,  setCurrentPw]  = useState('');
   const [newPw,      setNewPw]      = useState('');
   const [confirmPw,  setConfirmPw]  = useState('');
@@ -95,7 +97,7 @@ export default function SettingsPage() {
     e.preventDefault();
     setSecMsg(null);
     if (newPw !== confirmPw) { setSecMsg({ type: 'err', text: 'New passwords do not match.' }); return; }
-    const err = updateCredentials(currentPw, newId, newPw);
+    const err = updateCredentials(accountRole, currentPw, newId, newPw);
     if (err) { setSecMsg({ type: 'err', text: err }); }
     else {
       setSecMsg({ type: 'ok', text: 'Credentials updated successfully.' });
@@ -247,22 +249,36 @@ export default function SettingsPage() {
           <div className="settings-group">
             <h3>🔐 Security — Change Login Credentials</h3>
             <p className="muted" style={{ fontSize: 13, marginBottom: 18 }}>
-              Currently signed in as <strong style={{ color: 'var(--gold)' }}>{adminId}</strong>.
-              Enter your current password to make changes.
+              Signed in as <strong style={{ color: 'var(--gold)' }}>{userId}</strong>.
+              Administrators can change the admin or teacher sign-in.
             </p>
 
             <div className="settings-row">
-              <label>New Admin ID</label>
+              <label>Account</label>
+              <select
+                value={accountRole}
+                onChange={e => {
+                  const nextRole = e.target.value as UserRole;
+                  setAccountRole(nextRole);
+                  setNewId(nextRole === 'admin' ? userId : '');
+                }}
+              >
+                <option value="admin">Administration</option>
+                <option value="teacher">Teacher</option>
+              </select>
+            </div>
+            <div className="settings-row">
+              <label>New Login ID</label>
               <input
                 type="text"
                 value={newId}
                 onChange={e => setNewId(e.target.value)}
-                placeholder="New login ID"
+                placeholder="Enter new login ID"
                 autoComplete="username"
               />
             </div>
             <div className="settings-row">
-              <label>Current Password</label>
+              <label>Your Current Admin Password</label>
               <input
                 type={showPws ? 'text' : 'password'}
                 value={currentPw}
@@ -277,7 +293,7 @@ export default function SettingsPage() {
                 type={showPws ? 'text' : 'password'}
                 value={newPw}
                 onChange={e => setNewPw(e.target.value)}
-                placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
                 autoComplete="new-password"
               />
             </div>

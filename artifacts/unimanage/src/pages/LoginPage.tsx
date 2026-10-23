@@ -1,90 +1,79 @@
-import { useState, useRef, useEffect } from 'react';
-import { useAuth } from '../contexts/AuthContext';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import MeshBackground from '../components/MeshBackground';
+import { useAuth, type UserRole } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const { login } = useAuth();
-  const [id, setId]           = useState('');
+  const navigate = useNavigate();
+  const [role, setRole] = useState<UserRole>('admin');
+  const [id, setId] = useState('');
   const [password, setPassword] = useState('');
-  const [showPw, setShowPw]   = useState(false);
-  const [error, setError]     = useState('');
-  const [shaking, setShaking] = useState(false);
-  const idRef = useRef<HTMLInputElement>(null);
+  const [error, setError] = useState('');
 
-  useEffect(() => { idRef.current?.focus(); }, []);
-
-  function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setError('');
-    const ok = login(id.trim(), password);
-    if (!ok) {
-      setError('Incorrect ID or password. Please try again.');
-      setShaking(true);
-      setTimeout(() => setShaking(false), 500);
+  function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (login(role, id, password)) {
+      navigate('/dashboard');
+      return;
     }
+    setError('ID or password is incorrect for this sign-in type.');
   }
 
   return (
-    <div className="login-root">
+    <main className="login-root">
       <MeshBackground />
-      <div className={`login-card${shaking ? ' login-shake' : ''}`}>
-        {/* Logo */}
-        <div className="login-logo">
-          <div className="logo-mark">UM</div>
-        </div>
+      <section className="login-card">
+        <div className="login-logo"><div className="logo-mark">UM</div></div>
         <h1 className="login-title">UniManage</h1>
         <p className="login-subtitle">University Management System</p>
-        <p className="login-hint">Sign in to access the admin panel</p>
 
-        <form onSubmit={handleSubmit} className="login-form" autoComplete="off">
+        <div className="login-role-picker" aria-label="Choose sign-in type">
+          {(['admin', 'teacher'] as const).map((option) => (
+            <button
+              key={option}
+              type="button"
+              className={role === option ? 'btn-gold' : 'btn-muted'}
+              onClick={() => { setRole(option); setError(''); }}
+            >
+              {option === 'admin' ? 'Administration' : 'Teacher'}
+            </button>
+          ))}
+        </div>
+
+        <form onSubmit={submit} className="login-form">
           <div className="login-field">
-            <label htmlFor="login-id">Admin ID</label>
+            <label htmlFor="login-id">{role === 'admin' ? 'Admin ID' : 'Teacher ID'}</label>
             <input
-              ref={idRef}
               id="login-id"
-              type="text"
               value={id}
-              onChange={e => { setId(e.target.value); setError(''); }}
-              placeholder="Enter your admin ID"
+              onChange={(event) => { setId(event.target.value); setError(''); }}
               autoComplete="username"
+              required
+              autoFocus
+            />
+          </div>
+          <div className="login-field">
+            <label htmlFor="login-password">Password</label>
+            <input
+              id="login-password"
+              type="password"
+              value={password}
+              onChange={(event) => { setPassword(event.target.value); setError(''); }}
+              autoComplete="current-password"
               required
             />
           </div>
-
-          <div className="login-field">
-            <label htmlFor="login-pw">Password</label>
-            <div className="login-pw-wrap">
-              <input
-                id="login-pw"
-                type={showPw ? 'text' : 'password'}
-                value={password}
-                onChange={e => { setPassword(e.target.value); setError(''); }}
-                placeholder="Enter your password"
-                autoComplete="current-password"
-                required
-              />
-              <button
-                type="button"
-                className="login-eye"
-                onClick={() => setShowPw(v => !v)}
-                aria-label={showPw ? 'Hide password' : 'Show password'}
-              >
-                {showPw ? '🙈' : '👁️'}
-              </button>
-            </div>
-          </div>
-
           {error && <p className="login-error" role="alert">{error}</p>}
-
-          <button type="submit" className="login-btn">
-            Sign In →
-          </button>
+          <button type="submit" className="login-btn">Sign In</button>
         </form>
 
-        <p className="login-default-hint">
-          Default: ID&nbsp;<strong>admin</strong> / Password&nbsp;<strong>admin123</strong>
-        </p>
-      </div>
-    </div>
+        {import.meta.env.DEV && (
+          <p className="login-default-hint">
+            Local demo: admin / admin123 · teacher / teacher123
+          </p>
+        )}
+      </section>
+    </main>
   );
 }

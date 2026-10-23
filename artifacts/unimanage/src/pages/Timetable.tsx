@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 const PERIODS = [
@@ -23,6 +24,8 @@ const INIT_GRID: Grid = {
 };
 
 export default function Timetable() {
+  const { role } = useAuth();
+  const canManage = role === 'admin' || role === 'teacher';
   const [grid, setGrid] = useState<Grid>(INIT_GRID);
   const [edit, setEdit] = useState<{ day: string; period: string } | null>(null);
   const [form, setForm] = useState({ subject: '', room: '' });
@@ -87,7 +90,8 @@ export default function Timetable() {
                       <td
                         key={day}
                         className={`tt-td tt-td-slot${slot ? ' tt-td-filled' : ' tt-td-empty'}`}
-                        onClick={() => openEdit(day, period)}
+                        onClick={canManage ? () => openEdit(day, period) : undefined}
+                        style={{ cursor: canManage ? 'pointer' : 'default' }}
                       >
                         {slot ? (
                           <>
@@ -107,7 +111,7 @@ export default function Timetable() {
         </div>
       </div>
 
-      {edit && (
+      {canManage && edit && (
         <div className="modal-backdrop">
           <form className="modal" onSubmit={save} style={{ minWidth: 300 }}>
             <h3>Edit Slot — {edit.day}, {edit.period}</h3>

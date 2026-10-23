@@ -43,6 +43,9 @@ export default function Home() {
             <button className="btn-muted home-cta-btn" onClick={() => navigate('/about')}>
               Learn More
             </button>
+            <button className="btn-muted home-cta-btn" onClick={() => navigate('/students')}>
+              Student Information
+            </button>
           </div>
         </div>
       </section>

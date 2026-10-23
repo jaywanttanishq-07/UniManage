@@ -1,6 +1,6 @@
 import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider, canAccessRoute, useAuth } from './contexts/AuthContext';
 import NavBar          from './components/NavBar';
 import MeshBackground  from './components/MeshBackground';
 import LoginPage    from './pages/LoginPage';
@@ -25,20 +25,13 @@ import SettingsPage  from './pages/SettingsPage';
 import Attendance   from './pages/Attendance';
 import Scholarship  from './pages/Scholarship';
 
-// Pages that show without sidebar (public marketing pages)
 const PUBLIC_ROUTES = ['/', '/about', '/contact'];
 
 function AppInner() {
   const location   = useLocation();
-  const { isLoggedIn } = useAuth();
+  const { role } = useAuth();
   const isPublic   = PUBLIC_ROUTES.includes(location.pathname);
 
-  // ── Not logged in → show login screen for every app route ────────────────
-  if (!isLoggedIn && !isPublic) {
-    return <LoginPage />;
-  }
-
-  // ── Public marketing pages (no sidebar, no auth required) ────────────────
   if (isPublic) {
     return (
       <div className="app-root app-public">
@@ -52,7 +45,22 @@ function AppInner() {
     );
   }
 
-  // ── App routes (authenticated, sidebar layout) ────────────────────────────
+  if (!canAccessRoute(role, location.pathname)) {
+    return role ? (
+      <div className="login-root">
+        <section className="login-card">
+          <h1 className="login-title">Access restricted</h1>
+          <p className="muted">This section requires an administrator account.</p>
+          <button className="btn-gold" onClick={() => window.location.assign('/dashboard')}>
+            Back to dashboard
+          </button>
+        </section>
+      </div>
+    ) : (
+      <LoginPage />
+    );
+  }
+
   return (
     <div className="app-root">
       <MeshBackground />

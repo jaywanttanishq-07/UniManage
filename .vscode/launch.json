@@ -8,7 +8,6 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@workspace/api-server", "run", "dev"],
       "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.env",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
     },
@@ -19,18 +18,6 @@
       "runtimeExecutable": "pnpm",
       "runtimeArgs": ["--filter", "@workspace/unimanage", "run", "dev"],
       "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.env",
-      "console": "integratedTerminal",
-      "skipFiles": ["<node_internals>/**"]
-    },
-    {
-      "name": "Full Stack (API + Frontend)",
-      "type": "node",
-      "request": "launch",
-      "runtimeExecutable": "pnpm",
-      "runtimeArgs": ["run", "dev"],
-      "cwd": "${workspaceFolder}",
-      "envFile": "${workspaceFolder}/.env",
       "console": "integratedTerminal",
       "skipFiles": ["<node_internals>/**"]
     }
