@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 
 interface Notice { id: number; title: string; category: string; date: string; content: string; priority: string; author: string; }
 
-const INITIAL: Notice[] = [
+const STUDENT_NOTICES: Notice[] = [
   { id:1, title:'Holiday on 30th July 2026',            category:'General',    date:'2026-07-25', priority:'High',   author:'Admin Office',    content:'The university will remain closed on 30th July 2026 on account of a national holiday. All classes and examinations scheduled for that day will be rescheduled. Students are advised to check the updated schedule on the portal.' },
   { id:2, title:'Mid-Term Exam Schedule Released',       category:'Exam',       date:'2026-07-24', priority:'High',   author:'Examination Cell', content:'The mid-term examination schedule for all departments has been released. Students must carry their admit cards and follow the seating arrangement displayed outside the examination hall.' },
   { id:3, title:'Fee Payment Deadline — Semester 3 & 5',category:'Finance',    date:'2026-07-22', priority:'Medium', author:'Finance Dept.',   content:'Students of Semester 3 and 5 are reminded that the last date for fee payment is 2nd August 2026. A fine of ₹500 per day will be levied for late payments. Contact the accounts office for any queries.' },
@@ -12,20 +12,55 @@ const INITIAL: Notice[] = [
   { id:6, title:'Transport Route B — Stop Added',       category:'Transport',  date:'2026-07-15', priority:'Low',    author:'Transport Office', content:'A new stop at South Gate has been added to Transport Route B effective immediately. The revised schedule is available on the university website.' },
 ];
 
+const TEACHER_NOTICES: Notice[] = [
+  { id:101, title:'Faculty Meeting — Semester Planning', category:'Academic', date:'2026-07-28', priority:'High', author:'Academic Office', content:'Faculty members are invited to the semester planning meeting in the main conference room. Please bring course outlines and proposed assessment dates.' },
+  { id:102, title:'Library Staff Training Session', category:'Library', date:'2026-07-26', priority:'Medium', author:'Library Office', content:'A training session covering the updated library catalogue and circulation procedures will be held for faculty and staff.' },
+  { id:103, title:'Scholarship Review Committee', category:'Finance', date:'2026-07-23', priority:'Medium', author:'Finance Department', content:'Committee members should review pending scholarship applications before the next approval meeting.' },
+];
+
 const priorityBadge: Record<string, string> = { High: 'badge-red', Medium: 'badge-yellow', Low: 'badge-green' };
 
 const blank: Notice = { id:0, title:'', category:'General', date:'', content:'', priority:'Medium', author:'' };
 
-export default function Notices() {
+type NoticeAudience = 'students' | 'teachers';
+
+function loadNotices(audience: NoticeAudience) {
+  const initial = audience === 'teachers' ? TEACHER_NOTICES : STUDENT_NOTICES;
+  if (audience !== 'teachers') return initial;
+
+  try {
+    const saved = localStorage.getItem('um-teacher-notices');
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      if (Array.isArray(parsed)) return parsed as Notice[];
+    }
+  } catch {
+    // Use the sample teacher notices if saved data is unavailable.
+  }
+  return initial;
+}
+
+export default function Notices({ audience = 'students' }: { audience?: NoticeAudience }) {
   const { role } = useAuth();
-  const canManage = role === 'admin' || role === 'teacher';
-  const [list, setList] = useState<Notice[]>(INITIAL);
+  const canManage = audience === 'teachers' && role === 'teacher';
+  const storageKey = 'um-teacher-notices';
+  const [list, setList] = useState<Notice[]>(() => loadNotices(audience));
   const [q, setQ] = useState('');
   const [filter, setFilter] = useState('All');
   const [show, setShow] = useState(false);
   const [view, setView] = useState<Notice | null>(null);
   const [form, setForm] = useState<Notice>(blank);
   const [editing, setEditing] = useState(false);
+
+  useEffect(() => {
+    if (audience === 'teachers') {
+      try {
+        localStorage.setItem(storageKey, JSON.stringify(list));
+      } catch {
+        // The notice board remains usable for this session without browser storage.
+      }
+    }
+  }, [audience, list]);
 
   const cats = ['All', ...Array.from(new Set(list.map(n => n.category)))];
 
@@ -50,7 +85,12 @@ export default function Notices() {
   return (
     <section className="container">
       <header className="page-header">
-        <div><h1>Notices</h1><p className="muted">University announcements and circulars.</p></div>
+        <div>
+          <h1>{audience === 'teachers' ? 'Teacher Notices' : 'Notices'}</h1>
+          <p className="muted">
+            {audience === 'teachers' ? 'Faculty announcements and staff updates.' : 'University announcements and circulars.'}
+          </p>
+        </div>
         <div className="toolbar">
           <input className="search" value={q} onChange={e => setQ(e.target.value)} placeholder="Search notices…" />
           {canManage && <button className="btn-gold" onClick={openAdd}>+ Post Notice</button>}

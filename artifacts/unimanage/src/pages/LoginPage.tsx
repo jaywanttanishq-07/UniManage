@@ -1,12 +1,15 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import MeshBackground from '../components/MeshBackground';
 import { useAuth, type UserRole } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const { login } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
-  const [role, setRole] = useState<UserRole>('admin');
+  const [role, setRole] = useState<UserRole>(() =>
+    location.pathname.startsWith('/teacher') ? 'teacher' : 'admin',
+  );
   const [id, setId] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -14,7 +17,7 @@ export default function LoginPage() {
   function submit(event: React.FormEvent) {
     event.preventDefault();
     if (login(role, id, password)) {
-      navigate('/dashboard');
+      navigate(role === 'teacher' ? '/teacher-workspace' : '/dashboard');
       return;
     }
     setError('ID or password is incorrect for this sign-in type.');
@@ -36,14 +39,14 @@ export default function LoginPage() {
               className={role === option ? 'btn-gold' : 'btn-muted'}
               onClick={() => { setRole(option); setError(''); }}
             >
-              {option === 'admin' ? 'Administration' : 'Teacher'}
+              {option === 'admin' ? 'Administration' : 'Teacher / Faculty'}
             </button>
           ))}
         </div>
 
         <form onSubmit={submit} className="login-form">
           <div className="login-field">
-            <label htmlFor="login-id">{role === 'admin' ? 'Admin ID' : 'Teacher ID'}</label>
+              <label htmlFor="login-id">{role === 'admin' ? 'Admin ID' : 'Teacher / Faculty ID'}</label>
             <input
               id="login-id"
               value={id}

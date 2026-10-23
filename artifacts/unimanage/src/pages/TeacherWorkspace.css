@@ -1,0 +1,464 @@
+.teacher-workspace {
+  --tw-ink: var(--text);
+  --tw-soft: var(--muted);
+  --tw-accent: var(--gold);
+  --tw-outline: var(--card-border);
+  width: min(100%, 1120px);
+  min-height: 100dvh;
+  padding: 37px 34px 34px;
+  margin: 0 auto;
+  color: var(--tw-ink);
+  animation: fadeUp .38s ease both;
+}
+
+.tw-header {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 184px;
+  padding: 12px 8px 27px;
+  border-bottom: 1px solid var(--tw-outline);
+  overflow: hidden;
+}
+
+.tw-heading {
+  position: relative;
+  z-index: 1;
+}
+
+.tw-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 20px;
+  color: var(--tw-accent);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .17em;
+}
+
+.tw-eyebrow-rule {
+  width: 22px;
+  height: 1px;
+  background: var(--tw-accent);
+}
+
+.tw-eyebrow-separator {
+  color: var(--tw-soft);
+  opacity: .55;
+}
+
+.tw-heading h1 {
+  margin: 0;
+  font-size: clamp(30px, 4.4vw, 48px);
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -.045em;
+}
+
+.tw-heading > p {
+  margin: 12px 0 0;
+  color: var(--tw-soft);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.tw-header-mark {
+  position: relative;
+  display: grid;
+  width: 176px;
+  height: 156px;
+  margin-right: 44px;
+  place-items: center;
+  color: var(--tw-accent);
+}
+
+.tw-mark-orbit {
+  position: absolute;
+  border: 1px solid rgba(212, 175, 55, .19);
+  border-radius: 50%;
+}
+
+.tw-mark-orbit-outer {
+  width: 137px;
+  height: 137px;
+}
+
+.tw-mark-orbit-inner {
+  width: 102px;
+  height: 102px;
+  border-color: rgba(212, 175, 55, .27);
+}
+
+.tw-mark-core {
+  z-index: 1;
+  display: grid;
+  width: 66px;
+  height: 66px;
+  place-items: center;
+  border: 1px solid rgba(212, 175, 55, .38);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--gold) 10%, var(--panel));
+}
+
+.tw-mark-caption {
+  position: absolute;
+  right: -44px;
+  bottom: 22px;
+  color: var(--tw-soft);
+  font-size: 8px;
+  line-height: 1.55;
+  letter-spacing: .12em;
+  opacity: .62;
+}
+
+.tw-intro-band {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin: 23px 0 34px;
+  padding: 15px 18px;
+  border: 1px solid var(--tw-outline);
+  border-radius: 10px;
+  background: linear-gradient(100deg, color-mix(in srgb, var(--gold) 7%, var(--card-bg)), var(--card-bg) 65%);
+}
+
+.tw-intro-icon {
+  display: grid;
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  place-items: center;
+  border: 1px solid rgba(212, 175, 55, .26);
+  border-radius: 9px;
+  color: var(--tw-accent);
+  background: color-mix(in srgb, var(--gold) 9%, transparent);
+}
+
+.tw-intro-label {
+  display: block;
+  margin-bottom: 3px;
+  color: var(--tw-ink);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.tw-intro-band p {
+  margin: 0;
+  color: var(--tw-soft);
+  font-size: 12px;
+}
+
+.tw-intro-index {
+  margin-left: auto;
+  color: var(--tw-soft);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .12em;
+  opacity: .66;
+}
+
+.tw-groups {
+  display: flex;
+  flex-direction: column;
+  gap: 31px;
+}
+
+.tw-group-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 1px 13px;
+}
+
+.tw-group-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.tw-group-number {
+  color: var(--tw-accent);
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 11px;
+  opacity: .8;
+}
+
+.tw-group-heading h2 {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -.01em;
+}
+
+.tw-group-heading p {
+  margin: 3px 0 0;
+  color: var(--tw-soft);
+  font-size: 11px;
+}
+
+.tw-group-count {
+  color: var(--tw-soft);
+  font-size: 9px;
+  font-weight: 650;
+  letter-spacing: .13em;
+  opacity: .62;
+}
+
+.tw-module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 11px;
+}
+
+.tw-module {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 85px;
+  gap: 12px;
+  padding: 15px 14px;
+  overflow: hidden;
+  border: 1px solid var(--tw-outline);
+  border-radius: 10px;
+  background: var(--card-bg);
+  color: var(--tw-ink);
+  text-decoration: none;
+  animation: popIn .34s ease both;
+  transition: transform .18s ease, border-color .18s ease, background .18s ease;
+}
+
+.tw-module::before {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 2px;
+  background: var(--tw-accent);
+  content: "";
+  opacity: 0;
+  transform: scaleY(.35);
+  transition: opacity .18s ease, transform .18s ease;
+}
+
+.tw-module:hover {
+  z-index: 1;
+  border-color: color-mix(in srgb, var(--gold) 45%, var(--tw-outline));
+  background: color-mix(in srgb, var(--gold) 4%, var(--card-bg));
+  transform: translateY(-2px);
+}
+
+.tw-module:hover::before {
+  opacity: .9;
+  transform: scaleY(1);
+}
+
+.tw-module:focus-visible {
+  outline: 2px solid var(--tw-accent);
+  outline-offset: 3px;
+}
+
+.tw-module-icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 40px;
+  place-items: center;
+  border: 1px solid var(--tw-outline);
+  border-radius: 9px;
+  color: var(--tw-accent);
+  background: color-mix(in srgb, var(--gold) 7%, var(--panel));
+  transition: background .18s ease, border-color .18s ease;
+}
+
+.tw-module:hover .tw-module-icon {
+  border-color: rgba(212, 175, 55, .35);
+  background: color-mix(in srgb, var(--gold) 13%, var(--panel));
+}
+
+.tw-module-copy {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.tw-module-title {
+  font-size: 12.5px;
+  font-weight: 650;
+}
+
+.tw-module-description {
+  color: var(--tw-soft);
+  font-size: 10.5px;
+  line-height: 1.4;
+  opacity: .82;
+}
+
+.tw-module-arrow {
+  display: grid;
+  width: 24px;
+  height: 24px;
+  flex: 0 0 24px;
+  place-items: center;
+  color: var(--tw-soft);
+  opacity: .48;
+  transition: transform .18s ease, color .18s ease, opacity .18s ease;
+}
+
+.tw-module:hover .tw-module-arrow {
+  color: var(--tw-accent);
+  opacity: 1;
+  transform: translateX(3px);
+}
+
+.tw-footer {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 42px;
+  padding: 17px 2px 0;
+  border-top: 1px solid var(--tw-outline);
+}
+
+.tw-footer-rule {
+  width: 22px;
+  height: 1px;
+  background: var(--tw-accent);
+  opacity: .65;
+}
+
+.tw-footer p {
+  margin: 0;
+  color: var(--tw-soft);
+  font-size: 10px;
+}
+
+.tw-footer-brand {
+  margin-left: auto;
+  color: var(--tw-soft);
+  font-size: 10px;
+  opacity: .63;
+}
+
+.tw-footer-brand span {
+  padding: 0 4px;
+  color: var(--tw-accent);
+}
+
+@media (max-width: 900px) {
+  .tw-module-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .teacher-workspace {
+    padding: 25px 17px 28px;
+  }
+
+  .tw-header {
+    min-height: 155px;
+    padding: 6px 2px 21px;
+  }
+
+  .tw-eyebrow {
+    margin-bottom: 16px;
+    font-size: 9px;
+  }
+
+  .tw-heading h1 {
+    max-width: 290px;
+    font-size: clamp(29px, 8vw, 38px);
+  }
+
+  .tw-heading > p {
+    max-width: 260px;
+    font-size: 12px;
+  }
+
+  .tw-header-mark {
+    position: absolute;
+    right: -94px;
+    width: 145px;
+    height: 136px;
+    margin: 0;
+    opacity: .48;
+  }
+
+  .tw-mark-caption {
+    display: none;
+  }
+
+  .tw-mark-orbit-outer {
+    width: 112px;
+    height: 112px;
+  }
+
+  .tw-mark-orbit-inner {
+    width: 84px;
+    height: 84px;
+  }
+
+  .tw-mark-core {
+    width: 56px;
+    height: 56px;
+  }
+
+  .tw-intro-band {
+    gap: 11px;
+    margin: 18px 0 28px;
+    padding: 13px 12px;
+  }
+
+  .tw-intro-index {
+    display: none;
+  }
+
+  .tw-intro-band p {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+
+  .tw-groups {
+    gap: 26px;
+  }
+
+  .tw-group-count {
+    font-size: 8px;
+    letter-spacing: .08em;
+  }
+
+  .tw-module-grid {
+    grid-template-columns: 1fr;
+    gap: 9px;
+  }
+
+  .tw-module {
+    min-height: 76px;
+    padding: 12px;
+  }
+
+  .tw-module-description {
+    font-size: 11px;
+  }
+
+  .tw-footer {
+    margin-top: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teacher-workspace,
+  .tw-module {
+    animation: none;
+  }
+
+  .tw-module,
+  .tw-module::before,
+  .tw-module-icon,
+  .tw-module-arrow {
+    transition: none;
+  }
+}

@@ -1,0 +1,1 @@
+- [Teacher access boundaries](teacher-access-scope.md) — only Teacher/Faculty accounts enter the teacher workspace; student notices stay read-only and separate.

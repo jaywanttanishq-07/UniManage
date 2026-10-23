@@ -22,23 +22,30 @@ export const STUDENT_ROUTES = [
   '/library',
 ];
 
-const TEACHER_ROUTES = [
-  '/dashboard',
-  '/students',
-  '/teachers',
-  '/courses',
-  '/departments',
-  '/timetable',
-  '/exams',
-  '/results',
-  '/notices',
-  '/attendance',
-  '/library',
+export const TEACHER_ROUTES = [
+  '/teacher-workspace',
+  '/teacher/courses',
+  '/teacher/departments',
+  '/teacher/attendance',
+  '/teacher/exams',
+  '/teacher/results',
+  '/teacher/fees',
+  '/teacher/library',
+  '/teacher/hostel',
+  '/teacher/transport',
+  '/teacher/notices',
+  '/teacher/scholarship',
+  '/teacher/reports',
 ];
 
+export function isTeacherAreaRoute(path: string) {
+  return path === '/teacher-workspace' || path.startsWith('/teacher/');
+}
+
 export function canAccessRoute(role: UserRole | null, path: string) {
+  if (isTeacherAreaRoute(path)) return role === 'teacher' && TEACHER_ROUTES.includes(path);
+  if (role === 'teacher') return false;
   if (role === 'admin') return true;
-  if (role === 'teacher') return TEACHER_ROUTES.includes(path);
   return STUDENT_ROUTES.includes(path);
 }
 

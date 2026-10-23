@@ -1,6 +1,6 @@
-import { Routes, Route, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { AuthProvider, canAccessRoute, useAuth } from './contexts/AuthContext';
+import { AuthProvider, canAccessRoute, isTeacherAreaRoute, useAuth } from './contexts/AuthContext';
 import NavBar          from './components/NavBar';
 import MeshBackground  from './components/MeshBackground';
 import LoginPage    from './pages/LoginPage';
@@ -24,13 +24,21 @@ import Reports      from './pages/Reports';
 import SettingsPage  from './pages/SettingsPage';
 import Attendance   from './pages/Attendance';
 import Scholarship  from './pages/Scholarship';
+import TeacherWorkspace from './pages/TeacherWorkspace';
 
 const PUBLIC_ROUTES = ['/', '/about', '/contact'];
 
 function AppInner() {
   const location   = useLocation();
+  const navigate = useNavigate();
   const { role } = useAuth();
   const isPublic   = PUBLIC_ROUTES.includes(location.pathname);
+
+  if (location.pathname === '/login') {
+    return role
+      ? <Navigate to={role === 'teacher' ? '/teacher-workspace' : '/dashboard'} replace />
+      : <LoginPage />;
+  }
 
   if (isPublic) {
     return (
@@ -50,9 +58,13 @@ function AppInner() {
       <div className="login-root">
         <section className="login-card">
           <h1 className="login-title">Access restricted</h1>
-          <p className="muted">This section requires an administrator account.</p>
-          <button className="btn-gold" onClick={() => window.location.assign('/dashboard')}>
-            Back to dashboard
+          <p className="muted">
+            {isTeacherAreaRoute(location.pathname)
+              ? 'This workspace is only available to teachers and faculty.'
+              : 'This section is not available to teacher accounts.'}
+          </p>
+          <button className="btn-gold" onClick={() => navigate(role === 'teacher' ? '/teacher-workspace' : '/dashboard')}>
+            {role === 'teacher' ? 'Go to Teacher Workspace' : 'Back to dashboard'}
           </button>
         </section>
       </div>
@@ -84,8 +96,19 @@ function AppInner() {
           <Route path="/settings"    element={<SettingsPage />} />
           <Route path="/attendance"  element={<Attendance />} />
           <Route path="/scholarship" element={<Scholarship />} />
-          {/* Redirect bare /login back to dashboard if already logged in */}
-          <Route path="/login" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/teacher-workspace" element={<TeacherWorkspace />} />
+          <Route path="/teacher/courses" element={<Courses />} />
+          <Route path="/teacher/departments" element={<Departments />} />
+          <Route path="/teacher/attendance" element={<Attendance />} />
+          <Route path="/teacher/exams" element={<Exams />} />
+          <Route path="/teacher/results" element={<Results />} />
+          <Route path="/teacher/fees" element={<Fees />} />
+          <Route path="/teacher/library" element={<LibraryPage />} />
+          <Route path="/teacher/hostel" element={<Hostel />} />
+          <Route path="/teacher/transport" element={<Transport />} />
+          <Route path="/teacher/notices" element={<Notices audience="teachers" />} />
+          <Route path="/teacher/scholarship" element={<Scholarship />} />
+          <Route path="/teacher/reports" element={<Reports />} />
         </Routes>
       </div>
     </div>

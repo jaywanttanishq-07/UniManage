@@ -67,17 +67,45 @@ const sections: NavSection[] = [
   },
 ];
 
+const teacherSections: NavSection[] = [
+  {
+    label: 'Teacher Workspace',
+    links: [
+      { to: '/teacher-workspace', label: 'Overview', Icon: LayoutDashboard, end: true },
+      { to: '/teacher/courses', label: 'Courses', Icon: BookOpen },
+      { to: '/teacher/departments', label: 'Departments', Icon: Building2 },
+      { to: '/teacher/attendance', label: 'Attendance', Icon: CalendarCheck },
+      { to: '/teacher/exams', label: 'Exams', Icon: ClipboardList },
+      { to: '/teacher/results', label: 'Results', Icon: BarChart3 },
+    ],
+  },
+  {
+    label: 'Campus Services',
+    links: [
+      { to: '/teacher/fees', label: 'Fees', Icon: CreditCard },
+      { to: '/teacher/library', label: 'Library', Icon: Library },
+      { to: '/teacher/hostel', label: 'Hostel', Icon: BedDouble },
+      { to: '/teacher/transport', label: 'Transport', Icon: Bus },
+      { to: '/teacher/scholarship', label: 'Scholarships', Icon: Award },
+      { to: '/teacher/reports', label: 'Reports', Icon: FileText },
+      { to: '/teacher/notices', label: 'Teacher Notices', Icon: Bell },
+    ],
+  },
+];
+
 export default function NavBar() {
   const { theme, toggleTheme } = useTheme();
   const { logout, role, userId } = useAuth();
   const navigate = useNavigate();
 
   function handleLogout() {
+    const signedOutRole = role;
     logout();
-    navigate('/dashboard');
+    navigate(signedOutRole === 'teacher' ? '/teacher-workspace' : '/dashboard');
   }
 
-  const visibleSections = sections
+  const navigation = role === 'teacher' ? teacherSections : sections;
+  const visibleSections = navigation
     .map(section => ({
       ...section,
       links: section.links.filter(link =>
@@ -107,6 +135,7 @@ export default function NavBar() {
                 key={to}
                 to={to}
                 end={end}
+                data-testid={`link-nav-${to.slice(1).replaceAll('/', '-')}`}
                 className={({ isActive }) => isActive ? 'nav-link active' : 'nav-link'}
               >
                 <Icon size={16} />
